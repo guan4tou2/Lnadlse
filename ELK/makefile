@@ -8,7 +8,6 @@ check:
 	curl http://localhost:9200 -u elastic:changeme
 apikey:
 	docker-compose exec kibana bin/kibana-encryption-keys generate | tail -4 | tee kibana/config/kibana.yml
-restart:
 	docker restart docker-elk_kibana
 remove:
   	docker-compose down -v

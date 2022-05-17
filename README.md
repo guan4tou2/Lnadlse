@@ -1,4 +1,5 @@
 # Lightweight-network-attack-and-defense-learning-simulation-environment
+
 OS:Linux
 
 1. OS environment
@@ -9,20 +10,20 @@ sudo usermod -aG docker ${USER}
 ```
 
 2. install
-- Clone project.
+   - Clone project
 ```bash
 git clone https://github.com/guan4tou2/Lnadlse.git
 cd Lnadlse
 ```
 
-- Data-process-module install
+  - Data-process-module install
 ```bash
 cd ELK
 make
 ```
 After above command,you can use `make check` to check is elasticsearch successful install and running.
 
-- Attack-and-Defense-module install
+  - Attack-and-Defense-module install
 ```bash
 cd Machines
 make

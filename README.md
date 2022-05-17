@@ -28,7 +28,7 @@ cd Machines
 make
 ```
 It will build attack-and-defense-environment by default.Attacker is **kali(GUI)**,Targeter is **httpd** with packetbeat. </br>
-You can change machines by make.py.Use `python3 make.py -h` to see what machines can used.
+You can change machines by make.py. Use `python3 make.py -h` to see what machines can used.
 
 3. aider-module
 ```bash

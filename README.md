@@ -6,9 +6,9 @@ OS:Linux
 ```bash
 sudo apt update 
 sudo apt install -y git vim make docker docker-compose python3
-sudo usermod -aG docker ${USER}
+sudo chmod 666 /var/run/docker.sock
 ```
-Then log in again.
+
 
 2. install
   - Clone project

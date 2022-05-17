@@ -5,10 +5,12 @@ import re
 
 def removefile(x): return x.split(".")[0]
 
+path=os.path.dirname(os.path.realpath(__file__))
+
 targeter_list = "、".join(list(map(removefile, os.listdir(
-    os.path.join(os.getcwd(), "./Targeter")))))
+    os.path.join(path, "Targeter")))))
 attacker_list = "、".join(list(map(removefile, os.listdir(
-    os.path.join(os.getcwd(), "./Attacker")))))
+    os.path.join(path, "Attacker")))))
 # attacks_list="、".join(list(map(removefile,os.listdir(os.path.join(os.getcwd(),"Attacks")))))
 # beat_list="、".join(list(map(removefile,os.listdir(os.path.join(os.getcwd(),"Beat")))))
 
@@ -31,7 +33,7 @@ try:
 
     yml = ''
     makefile=''
-    with open('./docker-compose.yml', 'r') as f:
+    with open(os.path.join(path, 'docker-compose.yml'), 'r') as f:
         yml = f.read()
         result = re.finditer(r"image: '(\w*)'",  yml)
         machines = []
@@ -39,7 +41,7 @@ try:
             machines.append(_.groups()[0])
         yml = re.sub(machines[0], args.Targeter, yml)
         yml = re.sub(machines[1], args.Attacker, yml)
-    with open('./makefile', 'r') as f:
+    with open(os.path.join(path, 'makefile'), 'r') as f:
         makefile = f.read()
         result = re.finditer(r"-f=\.\/\w{8}\/(\w*)",  makefile)
         machines = []
@@ -48,9 +50,9 @@ try:
         makefile = re.sub(machines[0], args.Targeter, makefile)
         makefile = re.sub(machines[1], args.Attacker, makefile)
 
-    with open('./docker-compose.yml', 'w') as f:
+    with open(os.path.join(path, 'docker-compose.yml'), 'w') as f:
         f.write(yml)
-    with open('./makefile', 'w') as f:
+    with open(os.path.join(path, 'makefile'), 'w') as f:
         f.write(makefile)
     print(f"攻防環境模組已設置完成，攻擊機: {args.Targeter} ，靶機: {args.Attacker} ")
 except Exception as msg:

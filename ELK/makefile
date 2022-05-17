@@ -9,4 +9,4 @@ apikey:
 restart:
 	docker restart docker-elk_kibana
 remove:
-  docker-compose dwon -v
+  	docker-compose down -v

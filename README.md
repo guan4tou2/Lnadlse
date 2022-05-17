@@ -5,7 +5,7 @@ OS:Linux
 1. OS environment
 ```bash
 sudo apt update 
-sudo apt install -y git vim make docker docker-compose python3
+sudo apt install -y git vim make docker docker-compose python3 curl
 sudo chmod 666 /var/run/docker.sock
 ```
 

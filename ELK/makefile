@@ -7,7 +7,8 @@ install: #downlaod & setting ELK
 check:
 	curl http://localhost:9200 -u elastic:changeme
 apikey:
-	docker-compose exec kibana bin/kibana-encryption-keys generate | tail -4 | tee kibana/config/kibana.yml
+	cd docker-elk && \
+	docker-compose exec kibana bin/kibana-encryption-keys generate | tail -4 | tee kibana/config/kibana.yml 
 	docker restart docker-elk_kibana
 remove:
 	docker-compose down -v

@@ -1,4 +1,4 @@
-.PHONY: install check apikey restart remove
+.PHONY: install check apikey remove
 install: #downlaod & setting ELK
 	git clone https://github.com/deviantony/docker-elk.git
 	cd docker-elk && \

@@ -8,6 +8,7 @@ sudo apt update
 sudo apt install -y git vim make docker docker-compose python3
 sudo usermod -aG docker ${USER}
 ```
+Then log in again.
 
 2. install
   - Clone project

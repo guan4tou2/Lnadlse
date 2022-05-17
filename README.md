@@ -1,32 +1,33 @@
 # Lightweight-network-attack-and-defense-learning-simulation-environment
 OS:Linux
+
 1. OS environment
 ```bash
 sudo apt update 
 sudo apt install git vim make docker-ce docker-ce-cli containerd.io docker-compose-plugin python3
 sudo usermod -aG docker ${USER}
 ```
+
 2. install
-First,clone project.
+- Clone project.
 ```bash
 git clone https://github.com/guan4tou2/Lnadlse.git
 cd Lnadlse
 ```
 
- - Data-process-module install
+- Data-process-module install
 ```bash
 cd ELK
 make
 ```
 After above command,you can use `make check` to check is elasticsearch successful install and running.
 
- - Attack-and-Defense-module install
+- Attack-and-Defense-module install
 ```bash
 cd Machines
 make
 ```
-It will build attack-and-defense-environment by default.Attacker is **kali(GUI)**,Targeter is **httpd** with packetbeat.
-
+It will build attack-and-defense-environment by default.Attacker is **kali(GUI)**,Targeter is **httpd** with packetbeat. 
 You can change machines by make.py.Use `python3 make.py -h` to see what machines can used.
 
 3. aider-module

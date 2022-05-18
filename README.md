@@ -22,7 +22,7 @@ cd ELK
 make
 ```
 After above command,you can use `make check` to check is elasticsearch successful install and running. </br>
-If your kibana get error,it may be server.publicBaseUrl,you can try replace url elasticsearch to your ELK host ip. And restart it `docker restart docker-elk_kibana`.</br>
+If your kibana get error,it may be server.publicBaseUrl,you can try replace url elasticsearch to your ELK host ip in kibana/config/kibana.yml. And restart it `docker restart docker-elk_kibana`.</br>
 If you need api key,you can use `make apikey` to set it. </br>
 
   - Attack-and-Defense-module install

@@ -3,8 +3,9 @@ install:#build images
 	docker build -t targeter . -f=./Targeter/httpd
 	chmod 755 ./start.sh
 	docker build -t attacker . -f=./Attacker/kali
-	docker-compose -f ./docker-compose.yml up -d
+	docker-compose  up -d
+	#docker exec target makefile
 stop:#stop the containers
-	docker-compose -f ./docker-compose.yml stop
+	docker-compose  stop
 remove:#remove the containers
-	docker-compose -f ./docker-compose.yml down -v
+	docker-compose  down -v

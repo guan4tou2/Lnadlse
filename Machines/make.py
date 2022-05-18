@@ -3,14 +3,10 @@ import sys
 import os
 import re
 
-def removefile(x): return x.split(".")[0]
-
 path=os.path.dirname(os.path.realpath(__file__))
 
-targeter_list = "、".join(list(map(removefile, os.listdir(
-    os.path.join(path, "Targeter")))))
-attacker_list = "、".join(list(map(removefile, os.listdir(
-    os.path.join(path, "Attacker")))))
+targeter_list = "、".join(list(os.listdir(os.path.join(path, "Targeter")))).replace('、packetbeat','')
+attacker_list = "、".join(list(os.listdir(os.path.join(path, "Attacker")))).replace('、packetbeat','')
 # attacks_list="、".join(list(map(removefile,os.listdir(os.path.join(os.getcwd(),"Attacks")))))
 # beat_list="、".join(list(map(removefile,os.listdir(os.path.join(os.getcwd(),"Beat")))))
 

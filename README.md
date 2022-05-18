@@ -6,6 +6,7 @@ OS:Linux
 ```bash
 sudo apt update 
 sudo apt install -y git vim make docker.io docker-compose python3 curl
+sudo usermod -aG docker ${USER}
 sudo chmod 666 /var/run/docker.sock
 ```
 

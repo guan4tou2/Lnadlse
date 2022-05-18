@@ -6,7 +6,7 @@ import re
 path=os.path.dirname(os.path.realpath(__file__))
 
 targeter_list = "、".join(list(os.listdir(os.path.join(path, "Targeter")))).replace('、packetbeat','')
-attacker_list = "、".join(list(os.listdir(os.path.join(path, "Attacker")))).replace('、packetbeat','')
+attacker_list = "、".join(list(os.listdir(os.path.join(path, "Attacker"))))
 # attacks_list="、".join(list(map(removefile,os.listdir(os.path.join(os.getcwd(),"Attacks")))))
 # beat_list="、".join(list(map(removefile,os.listdir(os.path.join(os.getcwd(),"Beat")))))
 

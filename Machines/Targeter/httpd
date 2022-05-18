@@ -3,4 +3,5 @@ MAINTAINER weichen
 RUN apt update && apt upgrade -y && apt install -y make
 COPY packetbeat /home/
 WORKDIR /home/
-CMD ["/bin/bash","run"]
+EXPOSE 80
+CMD ["httpd-foreground"]

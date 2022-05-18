@@ -10,6 +10,8 @@ services:
     networks:
       - Cnet
       - docker-elk_elk
+    ports:
+      - "80:8080"
 
   attacker:
     image: 'kali'

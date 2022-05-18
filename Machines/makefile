@@ -4,7 +4,7 @@ install:#build images
 	chmod 755 ./start.sh
 	docker build -t attacker . -f=./Attacker/kali
 	docker-compose up -d
-	docker exec targeter "make"
+	docker exec `docker ps -aqf "name=targeter"` "make"
 stop:#stop the containers
 	docker-compose  stop
 remove:#remove the containers

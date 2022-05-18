@@ -1,18 +1,4 @@
 FROM httpd:2.4
 MAINTAINER weichen
-RUN apt update
-RUN apt upgrade -y
-RUN apt install make -y
-RUN apt install -y curl ca-certificates vim
-RUN curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-8.2.0-linux-x86_64.tar.gz
-RUN tar xzvf packetbeat-8.*-linux-x86_64.tar.gz
-RUN cd ./packetbeat-8.*-linux-x86_64 && \
-	sed -i 's/#setup.dashboards.enabled: false/setup.dashboards.enabled: true\nsetup.template.overwrite: false/g' packetbeat.yml && \
-	sed -i 's/hosts: \["localhost:9200"\]/hosts: \["elasticsearch:9200"\]/g' packetbeat.yml && \
-	sed -i 's/#username: "elastic"/username: "elastic"/g' packetbeat.yml && \
-	sed -i 's/#password: "changeme"/password: "changeme"/g' packetbeat.yml && \
-	sed -i 's/#host: "localhost:5601"/host: "elasticsearch:5601"\n  username: "elastic"\n  password: "changeme"/g' packetbeat.yml 
-RUN cd ./packetbeat-8.*-linux-x86_64 && ./packetbeat setup -e
-RUN cd ./packetbeat-8.*-linux-x86_64 && chown root packetbeat.yml 
-RUN cd ./packetbeat-8.*-linux-x86_64 && ./packetbeat -e
+
 CMD ["/bin/bash","run"]

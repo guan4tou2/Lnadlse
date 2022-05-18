@@ -3,14 +3,14 @@ beat:
 	apt update 
 	apt upgrade -y
 	apt install -y curl ca-certificates vim
-	curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-8.2.0-linux-x86_64.tar.gz
-	tar xzvf packetbeat-*-linux-x86_64.tar.gz
-	cd ./packetbeat-*-linux-x86_64 && \
+	RUN curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-8.2.0-linux-x86_64.tar.gz
+RUN tar xzvf packetbeat-8.*-linux-x86_64.tar.gz
+RUN cd ./packetbeat-8.*-linux-x86_64 && \
 	sed -i 's/#setup.dashboards.enabled: false/setup.dashboards.enabled: true\nsetup.template.overwrite: false/g' packetbeat.yml && \
 	sed -i 's/hosts: \["localhost:9200"\]/hosts: \["elasticsearch:9200"\]/g' packetbeat.yml && \
 	sed -i 's/#username: "elastic"/username: "elastic"/g' packetbeat.yml && \
-	sed -i 's/#password: "changeme"/password: "M@selab"/g' packetbeat.yml && \
-	sed -i 's/#host: "localhost:5601"/host: "elasticsearch:5601"\n  username: "elastic"\n  password: "M@selab"/g' packetbeat.yml && \
-	./packetbeat setup -e && \
-	chown root packetbeat.yml && \
-	./packetbeat -e
+	sed -i 's/#password: "changeme"/password: "changeme"/g' packetbeat.yml && \
+	sed -i 's/#host: "localhost:5601"/host: "elasticsearch:5601"\n  username: "elastic"\n  password: "changeme"/g' packetbeat.yml 
+RUN cd ./packetbeat-8.*-linux-x86_64 && ./packetbeat setup -e
+RUN cd ./packetbeat-8.*-linux-x86_64 && chown root packetbeat.yml 
+RUN cd ./packetbeat-8.*-linux-x86_64 && ./packetbeat -e

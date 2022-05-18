@@ -1,4 +1,5 @@
 FROM httpd:2.4
 MAINTAINER weichen
-
+RUN apt update && apt upgrade -y && apt install -y make
+COPY 
 CMD ["/bin/bash","run"]

@@ -3,7 +3,7 @@ version: '3.5'
 services:
   targeter:
     build: 
-      context: ./Targeter/hpptd
+      context: ./Targeter/httpd
     #image: 'targeter'
     #container_name: targeter
     tty: true

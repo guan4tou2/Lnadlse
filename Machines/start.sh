@@ -1,1 +1,1 @@
-export DISPLAY=host.docker.internal:0.0 && service ssh restart && /bin/bash
+DEBIAN_FRONTEND=noninteractive apt -y install kali-linux-large kali-desktop-xfce

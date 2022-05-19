@@ -2,13 +2,10 @@ version: '3.5'
 
 services:
   targeter:
-    build: 
-      context: ./Targeter/httpd
-    #image: 'targeter'
-    #container_name: targeter
+    image: 'targeter'
+    container_name: targeter
     tty: true
     stdin_open: true
-    restart: always
     command: bash
     networks:
       - Cnet
@@ -17,29 +14,10 @@ services:
       - "80:8080"
 
   attacker:
-    build: 
-      context: ./Attacker/kali
-      args:
-        KALI_USER: ${KALI_USER}
-        KALI_PASSWORD: ${KALI_PASSWORD}
-    privileged: true
-    #image: 'attacker'
-    #container_name: attacker
+    image: 'attacker'
+    container_name: attacker
     tty: true
     stdin_open: true
-    tmpfs:
-      - /run
-      - /tmp
-    security_opt:
-      - label:disable
-    shm_size: 1073741824
-    ports:
-      - "3389:3389"
-    working_dir: /
-    volumes:
-      - /dev/net:/dev/net:z
-      - ./data:/data
-    restart: always
     command: bash
     networks:
       - Cnet

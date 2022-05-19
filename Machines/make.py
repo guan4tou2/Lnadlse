@@ -27,7 +27,16 @@ try:
     # if args.Attack not in attacks_list.split('、'):print(f"Attack '{args.Attack}' 不存在，請重新選擇{attacks_list}")
     # if args.Beat not in beat_list.split('、'):print(f"Beat '{args.Beat}' 不存在，請重新選擇{beat_list}")
 
+    yml = ''
     makefile=''
+    with open(os.path.join(path, 'docker-compose.yml'), 'r') as f:
+        yml = f.read()
+        result = re.finditer(r"image: '(\w*)'",  yml)
+        machines = []
+        for _ in result:
+            machines.append(_.groups()[0])
+        yml = re.sub(machines[0], args.Targeter, yml)
+        yml = re.sub(machines[1], args.Attacker, yml)
     with open(os.path.join(path, 'makefile'), 'r') as f:
         makefile = f.read()
         result = re.finditer(r"-f=\.\/\w{8}\/(\w*)",  makefile)
@@ -37,6 +46,8 @@ try:
         makefile = re.sub(machines[0], args.Targeter, makefile)
         makefile = re.sub(machines[1], args.Attacker, makefile)
 
+    with open(os.path.join(path, 'docker-compose.yml'), 'w') as f:
+        f.write(yml)
     with open(os.path.join(path, 'makefile'), 'w') as f:
         f.write(makefile)
     print(f"攻防環境模組已設置完成，攻擊機: {args.Targeter} ，靶機: {args.Attacker} ")

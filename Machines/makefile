@@ -1,8 +1,8 @@
 .PHONY: install stop remove
 install:#build images
-	docker build -t targeter . -f=./Targeter/httpd
+	#docker build -t targeter . -f=./Targeter/httpd
 	chmod 755 ./start.sh
-	docker build -t attacker . -f=./Attacker/kali
+	#docker build -t attacker . -f=./Attacker/kali
 	docker-compose up -d
 	docker exec `docker ps -aqf "name=targeter"` "make"
 stop:#stop the containers

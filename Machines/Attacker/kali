@@ -18,7 +18,7 @@ RUN mkdir /data
 #RUN chmod 755 /setup.sh
 
 RUN apt-get -y install xorg xrdp iputils-ping 
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install kali-linux-large kali-desktop-xfce
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install  kali-desktop-xfce
 RUN useradd -ms /bin/bash $KALI_USER
 RUN echo "$KALI_USER:$KALI_PASSWORD" | chpasswd
 RUN echo "$KALI_USER ALL=(ALL:ALL) ALL" >> /etc/sudoers

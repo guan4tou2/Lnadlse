@@ -12,6 +12,7 @@ RUN echo "X11Forwarding yes" >> /etc/ssh/sshd_config
 RUN echo "X11UseLocalhost no" >> /etc/ssh/sshd_config
 
 ADD start.sh /start.sh
+RUN chmod 755 /setup.sh
 
 EXPOSE 22
 

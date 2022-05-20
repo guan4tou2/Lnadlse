@@ -6,7 +6,7 @@ services:
     container_name: targeter
     tty: true
     stdin_open: true
-    command: bash
+    #command: bash
     restart: always
     networks:
       - Cnet
@@ -19,7 +19,7 @@ services:
     container_name: attacker
     tty: true
     stdin_open: true
-    command: bash
+    #command: bash
     privileged: true
     restart: always
     cap_add:

@@ -1,15 +1,25 @@
 FROM kalilinux/kali-rolling
 
-RUN apt update
-RUN export DEBIAN_FRONTEND=noninteractive
-RUN apt install -y openssh-server x11-xserver-utils
+ARG KALI_USER=kali
+ARG KALI_PASSWORD=kali@123
+env KALI_USER=${KALI_USER} \
+    KALI_PASSWORD=${KALI_PASSWORD}
 
-RUN echo 'root:password' | chpasswd
+RUN apt update && apt -y upgrade &&  DEBIAN_FRONTEND=noninteractive \
+    apt install -y \
+    pciutils apt-utils bash-completion openssh-server x11-xserver-utils && \
+    apt-get autoremove -y && \
+    apt-get clean
+
 RUN echo "Port 22" >> /etc/ssh/sshd_config
 RUN echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
 RUN echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
 RUN echo "X11Forwarding yes" >> /etc/ssh/sshd_config
 RUN echo "X11UseLocalhost no" >> /etc/ssh/sshd_config
+
+RUN useradd -ms /bin/bash $KALI_USER
+RUN echo "$KALI_USER:$KALI_PASSWORD" | chpasswd
+RUN echo "$KALI_USER ALL=(ALL:ALL) ALL" >> /etc/sudoers
 
 ADD start.sh /start.sh
 RUN chmod 755 /setup.sh

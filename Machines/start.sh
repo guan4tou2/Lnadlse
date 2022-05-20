@@ -1,1 +1,1 @@
-DEBIAN_FRONTEND=noninteractive apt -y install kali-linux-large
+export DISPLAY=host.docker.internal:0.0 && service ssh restart && /bin/bash

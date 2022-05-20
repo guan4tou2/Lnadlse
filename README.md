@@ -41,10 +41,10 @@ docker run -d -p 9000:9000 --restart=always --name portainer -v /var/run/docker.
 It's not necessarily to install,but recommended.
 
 3. Useage
-`sudo apt install -y kali-linux-default`
-`kali-linux-large`
-sudo apt install remmina #linux
-mobaxterm #windows
+`sudo apt install -y kali-linux-default`  
+`kali-linux-large`  
+sudo apt install remmina #linux  
+mobaxterm #windows  
 
 4. Remove
   - Data-process-module

@@ -20,6 +20,7 @@ services:
     stdin_open: true
     command: bash
     privileged: true
+    restart: always
     cap_add:
       - net_admin
     tmpfs:

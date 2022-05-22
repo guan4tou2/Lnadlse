@@ -1,8 +1,10 @@
-.PHONY: install check apikey remove
+.PHONY: install start check apikey remove
 install: #downlaod & setting ELK
 	git clone https://github.com/deviantony/docker-elk.git
 	cd docker-elk && \
 	echo 'server.publicBaseUrl: "http://elasticsearch:5601"' >> kibana/config/kibana.yml && \
+	docker-compose up -d
+start:
 	docker-compose up -d
 check:
 	curl http://localhost:9200 -u elastic:changeme

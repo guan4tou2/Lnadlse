@@ -29,6 +29,7 @@ If you need api key,you can use `make apikey` to set it.
 cd Machines
 make
 ```
+After installed,use `make setbeat` to install packetbeat on targeter.  
 It will build attack-and-defense-environment by default.Attacker is **kali(GUI)**,Targeter is **httpd** with packetbeat.  
 You can change machines by make.py. Use `python3 make.py -h` to see what machines can used.  
 
@@ -70,4 +71,19 @@ make remove
  - aider-module
 ```bash
 docker stop portainer
+```
+
+5. Debug
+If `make setbeat` get error,you can try to change makefile in targeter.  
+Use `docker exec `docker ps -aqf "name=targeter"` /bin/bash` to connect,makefile will store at home directory.  
+```
+#sed -i 's/hosts: \["localhost:9200"\]/hosts: \["elasticsearch:9200"\]/g' packetbeat.yml && \
+sed -i 's/#username: "elastic"/username: "elastic"/g' packetbeat.yml && \
+sed -i 's/#password: "changeme"/password: "changeme"/g' packetbeat.yml && \
+sed -i 's/#host: "localhost:5601"/host: "localhost:5601"\n  username: "elastic"\n  password: "changeme"/g' packetbeat.yml 
+```
+change hosts url to your ip.  
+```
+sed -i 's/hosts: \["localhost:9200"\]/hosts: \["elasticsearch:9200"\]/g' packetbeat.yml && \
+sed -i 's/#host: "localhost:5601"/host: "localhost:5601"\n  username: "elastic"\n  password: "changeme"/g' packetbeat.yml 
 ```

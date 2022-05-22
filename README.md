@@ -32,7 +32,8 @@ make
 ```
 Before `make`,you can change attacker's username and password in makefile.  
 It will build attack-and-defense-environment by default.Attacker is **kali(GUI)**,Targeter is **httpd** with packetbeat.  
-You can change machines by make.py. Use `python3 make.py -h` to see what machines can used.  
+You can change machines by make.py.  
+Use `python3 make.py -h` to see what machines can used.  
 
  - aider-module install  
 ```bash

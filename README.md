@@ -75,15 +75,11 @@ docker stop portainer
 
 5. Debug  
 If `make setbeat` get error,you can try to change makefile in targeter.  
-Use `docker exec `docker ps -aqf "name=targeter"` /bin/bash` to connect,makefile will store at home directory.  
+Use `docker exec \`docker ps -aqf "name=targeter"\` "/bin/bash"` to connect,makefile will store at home directory.  
 ```
 #sed -i 's/hosts: \["localhost:9200"\]/hosts: \["elasticsearch:9200"\]/g' packetbeat.yml && \
 sed -i 's/#username: "elastic"/username: "elastic"/g' packetbeat.yml && \
 sed -i 's/#password: "changeme"/password: "changeme"/g' packetbeat.yml && \
-sed -i 's/#host: "localhost:5601"/host: "localhost:5601"\n  username: "elastic"\n  password: "changeme"/g' packetbeat.yml 
+sed -i 's/#host: "localhost:5601"/host: "elasticsearch:5601"\n  username: "elastic"\n  password: "changeme"/g' packetbeat.yml 
 ```
-change hosts url to your ip.  
-```
-sed -i 's/hosts: \["localhost:9200"\]/hosts: \["elasticsearch:9200"\]/g' packetbeat.yml && \
-sed -i 's/#host: "localhost:5601"/host: "localhost:5601"\n  username: "elastic"\n  password: "changeme"/g' packetbeat.yml 
-```
+change hosts url `elasticsearch` to your ip.  

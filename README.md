@@ -80,7 +80,7 @@ Use ```docker exec -it `docker ps -aqf "name=targeter"` "/bin/bash"``` to connec
 change hosts url `elasticsearch` to your ip.  
 ```bash
 cd ./packetbeat-8.*-linux-x86_64 
-sed -i 's/hosts: \["localhost:9200"\]/hosts: \["<elasticsearch>:9200"\]/g' packetbeat.yml && \
+sed -i 's/hosts: \["localhost:9200"\]/hosts: \["<elasticsearch>:9200"\]/g' packetbeat.yml 
 sed -i 's/#host: "localhost:5601"/host: "<elasticsearch>:5601"\n  username: "elastic"\n  password: "changeme"/g' packetbeat.yml 
 
 ./packetbeat setup -e

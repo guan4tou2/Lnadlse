@@ -1,50 +1,56 @@
 # Lightweight-network-attack-and-defense-learning-simulation-environment
 
-OS:Linux
+OS:Linux  
 
-1. OS environment
+1. OS environment  
 ```bash
 sudo apt update 
 sudo apt install -y git vim make docker.io docker-compose python3 curl
 sudo chmod 666 /var/run/docker.sock
 ```
 
-2. install
+2. install  
   - Clone project
 ```bash
 git clone https://github.com/guan4tou2/Lnadlse.git
 cd Lnadlse
 ```
-  - Data-process-module install
+  - Data-process-module install  
 ```bash
 cd ELK
 make
 ```
-After above command,you can use `make check` to check is elasticsearch successful install and running. </br>
-If your kibana get error,it may be server.publicBaseUrl,you can try replace url elasticsearch to your ELK host ip in kibana/config/kibana.yml. And restart it `docker restart docker-elk_kibana`.</br>
-If you need api key,you can use `make apikey` to set it. </br>
+After above command,you can use `make check` to check is elasticsearch successful install and running.  
+If your kibana get error,it may be server.publicBaseUrl,you can try replace url elasticsearch to your ELK host ip in kibana/config/kibana.yml. And restart it `docker restart docker-elk_kibana`.  
+If you need api key,you can use `make apikey` to set it.  
 
-  - Attack-and-Defense-module install
+  - Attack-and-Defense-module install  
 ```bash
 cd Machines
 make
 ```
-It will build attack-and-defense-environment by default.Attacker is **kali(GUI)**,Targeter is **httpd** with packetbeat. </br>
-You can change machines by make.py. Use `python3 make.py -h` to see what machines can used.</br>
+It will build attack-and-defense-environment by default.Attacker is **kali(GUI)**,Targeter is **httpd** with packetbeat.  
+You can change machines by make.py. Use `python3 make.py -h` to see what machines can used.  
 
- - aider-module install
+ - aider-module install  
 ```bash
 docker pull portainer/portainer
 docker run -d -p 9000:9000 --restart=always --name portainer -v /var/run/docker.sock:/var/run/docker.sock portainer/portainer
 ```
-[Portainer](https://github.com/portainer/portainer) can help you to manage your docker container. </br>
-It's not necessarily to install,but recommended.
+[Portainer](https://github.com/portainer/portainer) can help you to manage your docker container.   
+It's not necessarily to install,but recommended.  
 
 3. Useage  
-`sudo apt install -y kali-linux-default`  
-`kali-linux-large`  
-sudo apt install remmina #linux  
-mobaxterm #windows  
+  - Data-process-module  
+  Use kibana with `http://localhost:5601`
+  - Attack-and-Defense-module  
+  Use ssh or rdp to connect attacker  
+    - SSH `ssh kali@127.0.0.1 -p 222`  
+    - RDP `kali@127.0.0.1 port 3389`
+      - Windows **mobaxterm**
+      - Linux **remmina**   
+      
+  In attacker,if you want more tools,`sudo apt install -y <kali-linux-default> or <kali-linux-large>`.  
 
 4. Remove
   - Data-process-module

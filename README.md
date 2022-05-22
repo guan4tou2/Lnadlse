@@ -6,8 +6,9 @@ OS:Linux
 ```bash
 sudo apt update 
 sudo apt install -y git vim make docker.io docker-compose python3 curl
-sudo chmod 666 /var/run/docker.sock
 ```
+Add Docker permission  
+`sudo chmod 666 /var/run/docker.sock` or `sudo usermod -aG docker $USER && newgrp docker`(if this command don't work,you need reboot.)
 
 2. install  
   - Clone project

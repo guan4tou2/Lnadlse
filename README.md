@@ -42,8 +42,8 @@ It's not necessarily to install,but recommended.
 
 3. Useage  
   - Data-process-module  
-  Use kibana with `http://localhost:5601`
-  username and password is `elastic` adn `changeme`.
+  Use kibana with `http://localhost:5601`  
+  username and password is `elastic` adn `changeme`.  
   You can change password after you installed Data-process-module,find the file named `.env`.  
   - Attack-and-Defense-module  
   Use ssh or rdp to connect attacker  

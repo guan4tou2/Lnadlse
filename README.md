@@ -73,7 +73,7 @@ make remove
 docker stop portainer
 ```
 
-5. Debug
+5. Debug  
 If `make setbeat` get error,you can try to change makefile in targeter.  
 Use `docker exec `docker ps -aqf "name=targeter"` /bin/bash` to connect,makefile will store at home directory.  
 ```

@@ -43,14 +43,18 @@ It's not necessarily to install,but recommended.
 3. Useage  
   - Data-process-module  
   Use kibana with `http://localhost:5601`
+  username and password is `elastic` adn `changeme`.
+  You can change password after you installed Data-process-module,find the file named `.env`.  
   - Attack-and-Defense-module  
   Use ssh or rdp to connect attacker  
     - SSH `ssh kali@127.0.0.1 -p 222`  
-    - RDP `kali@127.0.0.1 port 3389`
+    - RDP `kali@127.0.0.1 port:3389`
       - Windows **mobaxterm**
-      - Linux **remmina**   
+      - Linux **remmina**  
       
-  In attacker,if you want more tools,`sudo apt install -y <kali-linux-default> or <kali-linux-large>`.  
+   password:kali@123  
+   You can change username and password,find the file what image you want in Attacker folder before you install Attack-and-Defense-module.  
+   In attacker,if you want more tools,`sudo apt install -y <kali-linux-default> or <kali-linux-large>`.  
 
 4. Remove
   - Data-process-module

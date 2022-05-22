@@ -5,7 +5,6 @@ install:#build images
 	docker build -t attacker . -f=./Attacker/kali-xrdp
 	docker-compose up -d
 setbeat:
-	docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' docker-elk_kibana_1
 	docker exec `docker ps -aqf "name=targeter"` "make"
 stop:#stop the containers
 	docker-compose  stop

@@ -1,9 +1,9 @@
 version: '3.5'
 
 services:
-  targeter:
+  Targeter:
     image: 'targeter'
-    container_name: targeter
+    container_name: Targeter
     tty: true
     stdin_open: true
     #command: bash
@@ -14,9 +14,9 @@ services:
     ports:
       - "80:80"
 
-  attacker:
+  Attacker:
     image: 'attacker'
-    container_name: attacker
+    container_name: Attacker
     tty: true
     stdin_open: true
     #command: bash

@@ -30,7 +30,7 @@ If you need api key,you can use `make apikey` to set it.
 cd Machines
 make
 ```
-After installed,use `make setbeat` to install packetbeat on targeter.  
+Before `make`,you can change attacker's username and password in makefile.  
 It will build attack-and-defense-environment by default.Attacker is **kali(GUI)**,Targeter is **httpd** with packetbeat.  
 You can change machines by make.py. Use `python3 make.py -h` to see what machines can used.  
 
@@ -45,8 +45,9 @@ It's not necessarily to install,but recommended.
 3. Useage  
   - Data-process-module  
   Use kibana with `http://localhost:5601`  
-  username and password is `elastic` adn `changeme`.  
-  You can change password after you installed Data-process-module,find the file named `.env`.  
+  username: elastic  
+  password: changeme    
+  You can change password after you installed Data-process-module,find the file named `.env`,And use `make start`.  
   - Attack-and-Defense-module  
   Use ssh or rdp to connect attacker  
     - SSH `ssh kali@127.0.0.1 -p 222`  
@@ -54,9 +55,9 @@ It's not necessarily to install,but recommended.
       - Windows **mobaxterm**
       - Linux **remmina**  
       
-   password:kali@123  
-   You can change username and password,find the file what image you want in Attacker folder before you install Attack-and-Defense-module.  
-   In attacker,if you want more tools,`sudo apt install -y <kali-linux-default> or <kali-linux-large>`.  
+   username: kali   
+   password: kali@123    
+   In attacker,if you want more tools,`sudo apt install -y <kali-linux-default> or <kali-linux-large>`.   
 
 4. Remove
   - Data-process-module
@@ -74,15 +75,3 @@ make remove
 docker stop portainer
 ```
 
-5. Debug  
-
-If `make setbeat` get error,you can try to change makefile in targeter.  
-Use ```docker exec -it `docker ps -aqf "name=targeter"` "/bin/bash"``` to connect,makefile will store at home directory.  
-change hosts url to your public ip.  
-```bash
-cd ./packetbeat-8.*-linux-x86_64 
-sed -i 's/#host: "elasticsearch:5601"/host: "<public ip>:5601"\n  username: "elastic"\n  password: "changeme"/g' packetbeat.yml 
-
-./packetbeat setup -e
-./packetbeat -e
-```

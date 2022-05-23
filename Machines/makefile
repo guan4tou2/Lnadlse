@@ -8,7 +8,7 @@ install:#build images
 	sed -i 's/ARG KALI_PASSWORD=kali@123/ARG KALI_PASSWORD=$(KALI_PASSWORD)/g' Attacker/kali-xrdp
 	docker build -t attacker_kali-xrdp . -f=./Attacker/kali-xrdp
 	docker-compose up -d
-	docker exec `docker ps -aqf "name=targeter_httpd"` "make"
+	docker exec `docker ps -aqf "name=Targeter"` "make"
 start:
 	docker-compose up -d
 stop:#stop the containers

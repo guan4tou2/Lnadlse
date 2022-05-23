@@ -20,5 +20,6 @@ RUN echo "$KALI_USER:$KALI_PASSWORD" | chpasswd
 RUN echo "$KALI_USER ALL=(ALL:ALL) ALL" >> /etc/sudoers
 
 EXPOSE 3389
+EXPOSE 22
 VOLUME /data /root /home/$KALI_USER
 ENTRYPOINT /etc/init.d/xrdp start && tail -F /var/log/xrdp-kali.log

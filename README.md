@@ -52,12 +52,12 @@ It's not necessarily to install,but recommended.
   - Attack-and-Defense-module  
   Use ssh or rdp to connect attacker  
     - SSH `ssh kali@127.0.0.1 -p 222`  
-    - RDP `kali@127.0.0.1 port:3389`
+    - RDP `kali@127.0.0.1`
       - Windows **mobaxterm**
       - Linux **remmina**  
       
    username: kali   
-   password: kali@123    
+   password: kali  
    In attacker,if you want more tools,`sudo apt install -y <kali-linux-default> or <kali-linux-large>`.   
 
 4. Remove

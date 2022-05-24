@@ -1,4 +1,4 @@
-.PHONY: install start check apikey remove
+.PHONY: install start stop check apikey remove
 kibanaip=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' docker-elk_kibana_1`
 install: #downlaod & setting ELK
 	git clone https://github.com/deviantony/docker-elk.git
@@ -7,6 +7,8 @@ install: #downlaod & setting ELK
 	docker-compose up -d
 start:
 	cd docker-elk && docker-compose up -d
+stop:
+	cd docker-elk && docker-compose dwon
 check:
 	curl http://elasticsearch:9200 -u elastic:changeme
 apikey:

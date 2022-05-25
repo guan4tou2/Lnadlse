@@ -1,9 +1,9 @@
 version: '3.5'
 
 services:
-  Targeter:
-    image: 'targeter_httpd'
-    container_name: Targeter
+  Targeted:
+    image: 'targeted_httpd'
+    container_name: Targeted
     tty: true
     stdin_open: true
     #command: bash

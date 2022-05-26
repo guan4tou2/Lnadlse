@@ -2,7 +2,7 @@
 kibanaip=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' docker-elk_kibana_1`
 install: #downlaod & setting ELK
 	git clone https://github.com/deviantony/docker-elk.git
-	cd docker-elk && \
+	cd docker-elk && docker-compose up -d &&\
 	echo server.publicBaseUrl: "http://$(kibanaip):5601" >> kibana/config/kibana.yml && \
 	docker-compose up -d
 start:

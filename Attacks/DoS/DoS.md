@@ -3,7 +3,7 @@ Slowloris是Dos攻擊的一種，原理是以極低的速度往server發送HTTP�
 2. 操作方式  
 安裝python: `sudo apt-get install python3`  
 安裝gitclone:`sudo apt-get install curl`  
-下載slowloris攻擊python檔案:`curl https://github.com/guan4tou2/Lnadlse/tree/main/Attacks/DoS `  
+下載slowloris攻擊python檔案:` wget --no-parent -r https://github.com/guan4tou2/Lnadlse/tree/main/Attacks/DoS `  
 本專題使用之Slowloris攻擊程式為原作者提供之程式碼並由Hox Framework所修改的版本，僅需更改Slowloris的Python程式內howmany_sockets、ip及port的內容即可。  
 howmany_sockets為設定要多少的連線數，ip為要攻擊的server IP，port為該server有開啟的port，預設為80 port。  
 3. 特徵  

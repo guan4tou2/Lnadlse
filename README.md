@@ -22,7 +22,7 @@ cd ELK
 make
 ```
 After above command,you can use `make check` to check is elasticsearch successful install and running.  
-If you get `curl: (56) Recv failure: Connection reset by peer`,restart terminal ant try chech again.  
+If you get `curl: (56) Recv failure: Connection reset by peer`,restart terminal and try chech again.  
 If your kibana get error,it may be server.publicBaseUrl,you can try replace url elasticsearch to your ELK host ip in kibana/config/kibana.yml. And restart it `docker restart docker-elk_kibana`.  
 If you need api key,you can use `make apikey` to set it.  
 

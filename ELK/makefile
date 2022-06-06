@@ -8,7 +8,7 @@ install: #downlaod & setting ELK
 start:
 	cd docker-elk && docker-compose up -d
 stop:
-	cd docker-elk && docker-compose dwon
+	cd docker-elk && docker-compose down
 check:
 	curl http://elasticsearch:9200 -u elastic:changeme
 apikey:

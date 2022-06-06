@@ -3,13 +3,15 @@ kibanaip=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{
 esip=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' docker-elk_elasticsearch_1`
 elastic_version=8.2.0
 install: #downlaod & setting ELK
-	if test -d docker-elk;then echo "exist";else git clone https://github.com/deviantony/docker-elk.git;fi;
+	if test -d docker-elk;then @make remove && rm -rf docker-elk;else echo "git";fi;
+	git clone https://github.com/deviantony/docker-elk.git
 	cd docker-elk &&\
 	sed -i "s/ELASTIC_VERSION=.\..\../ELASTIC_VERSION=$(elastic_version)/g" .env && \
 	docker-compose up -d &&\
-	sed -i "s/elasticsearch:9200/$(esip):9200/g" kibana/config/kibana.yml && \
+	
 	echo server.publicBaseUrl: "http://$(kibanaip):5601" >> kibana/config/kibana.yml && \
 	docker-compose up -d
+	#sed -i "s/elasticsearch:9200/$(esip):9200/g" kibana/config/kibana.yml && \
 	@make show
 	@make check
 show:

@@ -9,7 +9,8 @@ install: #downlaod & setting ELK
 	sed -i "s/elasticsearch:9200/$(esip):9200/g" kibana/config/kibana.yml && \
 	echo server.publicBaseUrl: "http://$(kibanaip):5601" >> kibana/config/kibana.yml && \
 	docker-compose up -d
-	@show
+	@make show
+	@make check
 show:
 	@echo kibana ip is $(kibanaip)
 	@echo es ip is $(esip)

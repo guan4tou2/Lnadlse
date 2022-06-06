@@ -1,8 +1,8 @@
 # Lightweight-network-attack-and-defense-learning-simulation-environment
 # 輕便化之網路攻防學習模擬環境  
 
-OS:Linux  Ubuntu Desktop
-ELK version:8.1.0
+OS:Linux  Ubuntu Desktop. 
+ELK version:8.2.0
 1. OS environment  
 ```bash
 sudo apt update 

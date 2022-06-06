@@ -8,9 +8,9 @@ install: #downlaod & setting ELK
 	cd docker-elk &&\
 	sed -i "s/ELASTIC_VERSION=.\..\../ELASTIC_VERSION=$(elastic_version)/g" .env && \
 	docker-compose up -d &&\
+	sed -i "s/elasticsearch:9200/$(esip):9200/g" kibana/config/kibana.yml && \
 	echo server.publicBaseUrl: "http://$(kibanaip):5601" >> kibana/config/kibana.yml && \
 	docker-compose up -d
-	#sed -i "s/elasticsearch:9200/$(esip):9200/g" kibana/config/kibana.yml && \
 	@make show
 	@make check
 show:

@@ -1,4 +1,4 @@
-.PHONY: install start stop check apikey remove
+.PHONY: install start stop check apikey remove show
 kibanaip=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' docker-elk_kibana_1`
 esip=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' docker-elk_elasticsearch_1`
 install: #downlaod & setting ELK
@@ -9,6 +9,8 @@ install: #downlaod & setting ELK
 	sed -i "s/elasticsearch:9200/$(esip):9200/g" kibana/config/kibana.yml && \
 	echo server.publicBaseUrl: "http://$(kibanaip):5601" >> kibana/config/kibana.yml && \
 	docker-compose up -d
+	@show
+show:
 	@echo kibana ip is $(kibanaip)
 	@echo es ip is $(esip)
 start:

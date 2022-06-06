@@ -4,6 +4,7 @@ esip=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}
 install: #downlaod & setting ELK
 	git clone https://github.com/deviantony/docker-elk.git
 	cd docker-elk && docker-compose up -d &&\
+	sed -i 's/"http://elasticsearch:9200"/"http://$(esip):9200"/g' kibana/config/kibana.yml && \
 	echo server.publicBaseUrl: "http://$(kibanaip):5601" >> kibana/config/kibana.yml && \
 	docker-compose up -d
 start:

@@ -1,5 +1,6 @@
 .PHONY: install start stop check apikey remove
 kibanaip=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' docker-elk_kibana_1`
+esip=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' docker-elk_elasticsearch_1`
 install: #downlaod & setting ELK
 	git clone https://github.com/deviantony/docker-elk.git
 	cd docker-elk && docker-compose up -d &&\
@@ -10,7 +11,7 @@ start:
 stop:
 	cd docker-elk && docker-compose down
 check:
-	curl http://elasticsearch:9200 -u elastic:changeme
+	curl http://$(esip):9200 -u elastic:changeme
 apikey:
 	cd docker-elk && \
 	docker-compose exec kibana bin/kibana-encryption-keys generate | tail -4 | tee kibana/config/kibana.yml 

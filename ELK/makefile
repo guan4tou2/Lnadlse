@@ -3,7 +3,7 @@ kibanaip=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{
 esip=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' docker-elk_elasticsearch_1`
 elastic_version=8.2.0
 install: #downlaod & setting ELK
-	if test -d docker-elk;then @make remove && rm -rf docker-elk;else echo "git";fi;
+	if test -d docker-elk;then make remove && rm -rf docker-elk;else echo "git";fi;
 	git clone https://github.com/deviantony/docker-elk.git
 	cd docker-elk &&\
 	sed -i "s/ELASTIC_VERSION=.\..\../ELASTIC_VERSION=$(elastic_version)/g" .env && \

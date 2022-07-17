@@ -1,0 +1,49 @@
+version: '3.5'
+
+services:
+  #targeted start
+  Targeted-num:
+    image: 'targeted'
+    container_name: Targeted-num
+    tty: true
+    stdin_open: true
+    #command: bash
+    restart: always
+    networks:
+      - Cnet
+      - docker-elk_elk
+    ports:
+      - "80num:80"
+  #targeted end
+  #attacker start
+  Attacker-num:
+    image: 'attacker'
+    container_name: Attacker-num
+    tty: true
+    stdin_open: true
+    #command: bash
+    privileged: true
+    restart: always
+    cap_add:
+      - net_admin
+    tmpfs:
+      - /run
+      - /tmp
+    security_opt:
+      - label:disable
+    ports:
+      - "3389:3389"
+      - "222:22"
+    working_dir: /
+    volumes:
+      - /dev/net:/dev/net:z
+      - ./data:/data
+    networks:
+      - Cnet
+  #attacker start
+
+networks:
+  Cnet:
+    driver: bridge
+  docker-elk_elk:
+    external: true

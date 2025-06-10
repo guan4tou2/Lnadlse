@@ -1,0 +1,48 @@
+version: "3.8"
+
+services:
+  target-nginx:
+    image: targeted_nginx
+    container_name: target-nginx
+    networks:
+      - simulation_net
+    ports:
+      - "8080:80"
+    depends_on:
+      - attacker
+
+  target-httpd:
+    image: targeted_httpd
+    container_name: target-httpd
+    networks:
+      - simulation_net
+    ports:
+      - "8081:80"
+    depends_on:
+      - attacker
+
+  attacker:
+    image: attacker_kali-novnc
+    container_name: attacker
+    networks:
+      - simulation_net
+    ports:
+      - "22:22"
+      - "3389:3389"
+      - "5901:5901"
+      - "6080:6080"
+    privileged: true
+    cap_add:
+      - net_admin
+    tmpfs:
+      - /run
+      - /tmp
+    security_opt:
+      - label:disable
+    volumes:
+      - /dev/net:/dev/net:z
+      - ./data:/data
+
+networks:
+  simulation_net:
+    driver: bridge 

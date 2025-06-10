@@ -1,7 +1,7 @@
 FROM kalilinux/kali-rolling
 
 ARG KALI_USER=kali
-ARG KALI_PASSWORD=kali@123
+ARG KALI_PASSWORD=kali
 env KALI_USER=${KALI_USER} \
     KALI_PASSWORD=${KALI_PASSWORD}
 

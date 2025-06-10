@@ -52,16 +52,19 @@ It's not necessarily to install,but recommended.
   You can change password after you installed Data-process-module,find the file named `.env`,And use `make start`.  
   - Attack-and-Defense-module  
   Use ssh or rdp to connect attacker  
-    - SSH `ssh kali@127.0.0.1 -p 222`  
-    - RDP `kali@127.0.0.1`
+    - SSH `ssh kali@kali_ip -p 222`  
+    - RDP `kali@kali_ip`
       - Windows **mobaxterm**
       - Linux **remmina**  
+    - x11
+      - `xhost +local:docker`
+      - `ssh -X kali@kali_ip -p 22`
       
    username: kali   
    password: kali  
    In attacker,if you want more tools,`sudo apt install -y <kali-linux-default> or <kali-linux-large>`.   
 
-4. Remove
+1. Remove
   - Data-process-module
 ```bash
 cd ELK

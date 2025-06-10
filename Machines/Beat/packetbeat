@@ -1,15 +1,17 @@
 .PHONY:beat
-version=8.2.0
+version=9.0.0
+arch=linux-arm64
 beat:
 	apt update 
 	apt upgrade -y
 	apt install -y curl ca-certificates vim
-	curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-$(version)-linux-x86_64.tar.gz
-	tar xzvf packetbeat-8.*-linux-x86_64.tar.gz
-	cd ./packetbeat-8.*-linux-x86_64 && \
+	curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-$(version)-$(arch).tar.gz
+	tar xzvf packetbeat-$(version)-$(arch).tar.gz
+	cd ./packetbeat-$(version)-$(arch) && \
+		sed -i '/^output.elasticsearch:/a \  ssl.verification_mode: none' packetbeat.yml && \
 		sed -i 's/#setup.dashboards.enabled: false/setup.dashboards.enabled: true\nsetup.template.overwrite: false/g' packetbeat.yml && \
-		sed -i 's/hosts: \["localhost:9200"\]/hosts: \["elasticsearch:9200"\]/g' packetbeat.yml && \
+		sed -i 's/hosts: \["localhost:9200"\]/hosts: \["https:\/\/es01:9200"\]/g' packetbeat.yml && \
 		sed -i 's/#username: "elastic"/username: "elastic"/g' packetbeat.yml && \
 		sed -i 's/#password: "changeme"/password: "changeme"/g' packetbeat.yml && \
-		sed -i 's/#host: "localhost:5601"/host: "kibanaip:5601"\n  username: "elastic"\n  password: "changeme"/g' packetbeat.yml 
-	cd ./packetbeat-8.*-linux-x86_64 && ./packetbeat setup -e && chown root packetbeat.yml && ./packetbeat -e
+		sed -i 's/#host: "localhost:5601"/host: "kibana:5601"\n  username: "elastic"\n  password: "changeme"/g' packetbeat.yml 
+	cd ./packetbeat-$(version)-$(arch) && ./packetbeat setup -e && chown root packetbeat.yml && ./packetbeat -e &

@@ -1,0 +1,27 @@
+version: "2.2"
+
+services:
+  targeted-1:
+    image: targeted_nginx
+    depends_on:
+      - attacker-1
+    container_name: targeted-1
+    networks:
+      - elk
+    ports:
+      - "80:80"
+
+  attacker-1:
+    image: attacker_kali-novnc
+    container_name: attacker-1
+    networks:
+      - elk
+    ports:
+      - "22:22"
+      - "3389:3389"
+      - "5901:5901"
+      - "6080:6080"
+
+networks:
+  elk:
+    external: true

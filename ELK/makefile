@@ -10,11 +10,7 @@ install: #setup ELK with existing files
 	@if ! docker network ls | grep -q elk_net; then \
 		docker network create elk_net; \
 	fi
-	docker-compose up -d
-	@echo "Waiting for services to initialize..."
-	@sleep 30
-	@make show
-	@make check
+	docker-compose build
 
 show:
 	@echo "Kibana IP: $(kibanaip)"
@@ -22,6 +18,10 @@ show:
 
 start:
 	docker-compose up -d
+	@echo "Waiting for services to initialize..."
+	@sleep 30
+	@make show
+	@make check
 
 stop:
 	docker-compose down

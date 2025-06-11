@@ -555,6 +555,73 @@ def stop_all():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
+@app.route("/api/stop_simulation", methods=["POST"])
+def stop_simulation():
+    try:
+        compose_cmd = get_docker_compose_command()
+
+        # Stop simulation environment
+        machines_dir = os.path.join(
+            os.path.dirname(os.path.dirname(__file__)), "Machines"
+        )
+        subprocess.run(
+            compose_cmd + ["-f", "docker-compose-simulation.yml", "down", "-v"],
+            cwd=machines_dir,
+            check=True,
+        )
+
+        # Force stop any remaining simulation containers
+        client = docker.from_env()
+        containers = client.containers.list(all=True)
+        simulation_prefixes = ["target", "attacker"]
+        for container in containers:
+            container_name = container.name.lower()
+            if any(prefix in container_name for prefix in simulation_prefixes):
+                try:
+                    container.stop()
+                    container.remove()
+                except Exception as e:
+                    print(f"Error stopping container {container.name}: {e}")
+
+        return jsonify(
+            {
+                "status": "success",
+                "message": "Simulation environment stopped successfully",
+            }
+        )
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
+@app.route("/api/stop_elk", methods=["POST"])
+def stop_elk():
+    try:
+        compose_cmd = get_docker_compose_command()
+
+        # Stop ELK
+        elk_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "ELK")
+        subprocess.run(compose_cmd + ["down", "-v"], cwd=elk_dir, check=True)
+
+        # Force stop any remaining ELK containers
+        client = docker.from_env()
+        containers = client.containers.list(all=True)
+        elk_prefixes = ["elk", "elasticsearch", "logstash", "kibana"]
+        for container in containers:
+            container_name = container.name.lower()
+            if any(prefix in container_name for prefix in elk_prefixes):
+                try:
+                    container.stop()
+                    container.remove()
+                except Exception as e:
+                    print(f"Error stopping container {container.name}: {e}")
+
+        return jsonify(
+            {"status": "success", "message": "ELK Stack stopped successfully"}
+        )
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
 @app.route("/api/start_simulation", methods=["POST"])
 def start_simulation():
     try:

@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-import subprocess,os
-from pathlib import Path
-
 import os
 import subprocess
 
 BASE_DIRS = {"Targeted": "./Targeted", "Attacker": "./Attacker"}
 
 DOCKER_NETWORK = "elk_net"
+
+# 默认构建的 Dockerfile 路径
+DEFAULT_BUILDS = {"targeted": "./Targeted/nginx", "attacker": "./Attacker/kali-novnc"}
 
 
 def find_docker_builds(base_dir):
@@ -57,9 +57,10 @@ def install():
     print("Select what to build:")
     print("1. Targeted")
     print("2. Attacker")
-    print("3. All")
+    print("3. Default (Nginx + noVNC Kali)")
+    print("4. All")
 
-    choice = input("Enter your choice (1/2/3): ").strip()
+    choice = input("Enter your choice (1/2/3/4): ").strip()
 
     selected_dirs = []
     if choice == "1":
@@ -67,6 +68,12 @@ def install():
     elif choice == "2":
         selected_dirs = [("attacker", BASE_DIRS["Attacker"])]
     elif choice == "3":
+        # 直接使用默认的 Nginx 和 noVNC Kali
+        print("[*] Building default images (Nginx + noVNC Kali)...")
+        for prefix, path in DEFAULT_BUILDS.items():
+            build_image(path, prefix)
+        return
+    elif choice == "4":
         selected_dirs = [
             ("targeted", BASE_DIRS["Targeted"]),
             ("attacker", BASE_DIRS["Attacker"]),
@@ -83,6 +90,7 @@ def install():
         selected = select_path(docker_paths)
         if selected:
             build_image(selected, prefix)
+
 
 def create_network():
     print(f"[*] Checking Docker network '{DOCKER_NETWORK}'...")

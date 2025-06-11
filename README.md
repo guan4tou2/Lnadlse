@@ -1,4 +1,5 @@
-# Network Security Simulation Environment
+# Lightweight-network-attack-and-defense-learning-simulation-environment
+# [輕便化之網路攻防學習模擬環境](README_ch.md)
 
 A Docker-based network security simulation environment that includes ELK stack for log analysis and attack simulation environment.
 
@@ -8,6 +9,23 @@ A Docker-based network security simulation environment that includes ELK stack f
 - Docker Compose
 - Python 3.8+
 - Make
+
+## Running Environment
+
+### ELK Stack
+- Elasticsearch: 9.0.0
+- Logstash: 9.0.0
+- Kibana: 9.0.0
+
+### Target Machines
+- Nginx: latest
+- Httpd: latest
+
+### Attacker Machines
+- Kali Linux: latest
+  - noVNC: Web-based VNC client
+  - Xrdp: Remote Desktop Protocol
+  - X11: X Window System
 
 ## Installation Steps
 
@@ -31,11 +49,12 @@ python make.py install
 During installation, you need to select what to build:
 - 1: Build target machines only (Targeted)
 - 2: Build attacker machines only (Attacker)
-- 3: Build all machines
+- 3: Build default machines (Nginx + noVNC Kali)
+- 4: Build all machines
 
 Then select specific machine types to build.
 
-4. Install Python dependencies:
+1. Install Python dependencies:
 ```bash
 cd Web
 pip install -r requirements.txt

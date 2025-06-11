@@ -1,27 +1,49 @@
-version: "2.2"
+version: '3.5'
 
 services:
-  targeted-1:
-    image: targeted_nginx
-    depends_on:
-      - attacker-1
-    container_name: targeted-1
+  #targeted start
+  Targeted-1:
+    image: 'httpd'
+    container_name: Targeted-1
+    tty: true
+    stdin_open: true
+    #command: bash
+    restart: always
     networks:
-      - elk_net
+      - Cnet
+      - docker-elk_elk
     ports:
-      - "80:80"
-
-  attacker-1:
-    image: attacker_kali-novnc
-    container_name: attacker-1
-    networks:
-      - elk_net
+      - "801:80"
+  #targeted end
+  #attacker start
+  Attacker-1:
+    image: 'kali-xrdp'
+    container_name: Attacker-1
+    tty: true
+    stdin_open: true
+    #command: bash
+    privileged: true
+    restart: always
+    cap_add:
+      - net_admin
+    tmpfs:
+      - /run
+      - /tmp
+    security_opt:
+      - label:disable
     ports:
-      - "22:22"
       - "3389:3389"
-      - "5901:5901"
-      - "8080:8080"
+      - "222:22"
+    working_dir: /
+    volumes:
+      - /dev/net:/dev/net:z
+      - ./data:/data
+    networks:
+      - Cnet
+  #attacker start
 
 networks:
-  elk_net:
+  Cnet:
+    driver: bridge
+  docker-elk_elk:
     external: true

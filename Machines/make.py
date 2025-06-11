@@ -1,64 +1,125 @@
-import argparse
+#!/usr/bin/env python3
+import subprocess,os
+from pathlib import Path
+
 import os
-import re
+import subprocess
 
-path=os.path.dirname(os.path.realpath(__file__))
+BASE_DIRS = {"Targeted": "./Targeted", "Attacker": "./Attacker"}
 
-TargetedList = "、".join(list(os.listdir(os.path.join(path, "Targeted")))).replace('、packetbeat','')
-AttackerList = "、".join(list(os.listdir(os.path.join(path, "Attacker"))))
+DOCKER_NETWORK = "elk_net"
 
-parser = argparse.ArgumentParser(prog="make", description="建立攻防環境模組安裝文件")
-parser.add_argument("-T", "--Targeted", default="httpd",
-                    type=str, help=f"請選擇靶機image名稱，有[{TargetedList}]")
-parser.add_argument("-t", "--TargetedNum", default="1",
-                    type=str, help=f"請選擇靶機數量")
-parser.add_argument("-A", "--Attacker", default="kali-xrdp",
-                    type=str, help=f"請選擇攻擊機image名稱，有[{AttackerList}]")
-parser.add_argument("-a", "--AttackerNum", default="1",
-                    type=str, help=f"請選擇靶機數量")
 
-args = parser.parse_args()
-print(args)
-try:
-    if args.Targeted not in TargetedList.split('、'):
-        raise Exception(f"Targeted '{args.Targeted}' 不存在，請重新選擇{TargetedList}")
-    if args.Attacker not in AttackerList.split('、'):
-        raise Exception(f"Attacker '{args.Attacker}' 不存在，請重新選擇{AttackerList}")
-    targetednum = int(args.TargetedNum)
-    attackernum = int(args.AttackerNum)
+def find_docker_builds(base_dir):
+    docker_paths = []
+    for root, dirs, files in os.walk(base_dir):
+        if "Dockerfile" in files:
+            docker_paths.append(root)
+    return docker_paths
 
-    #docker compose
-    with open(os.path.join(path, 'docker-compose-example.yml'), 'r',encoding="utf-8") as f:
-        yml = f.read()
-    targeted = re.search(
-        r"#targeted start\n  ([:\w\n \-'_#\"\d]*)  #targeted end",  yml).group(1)
-    attacker = re.search(
-        r"#attacker start\n  ([:\w\n \-'_#\"\d/\.]*)  #attacker start",  yml).group(1)
-    yml=re.sub(targeted,"#targeted#\n",yml)
-    yml=re.sub(attacker,"#attacker#\n",yml)
-    targeted = re.sub(r"targeted", args.Targeted, targeted)
-    attacker = re.sub(r"attacker", args.Attacker, attacker)
 
-    #makefile
-    with open(os.path.join(path, 'makefile-example'), 'r',encoding="utf-8") as f:
-        makefile = f.read()
-    makefile = re.sub(r'targeted', args.Targeted, makefile)
-    makefile = re.sub(r'attacker', args.Attacker, makefile)
-    
-    Targeted = "".join([re.sub(r"num", str(i+1), targeted) for i in range(targetednum)])
-    Attacker = "".join([re.sub(r"num", str(i+1), attacker)
-                       for i in range(attackernum)])
-    Make = "".join([f'\tdocker exec `docker ps -aqf "name=Targeted-{i+1}"` "make"\n' for i in range(targetednum)])
-    makefile = re.sub(
-        r'\tdocker exec `docker ps -aqf "name=Targeted-num"` "make"', Make, makefile)
-    yml = re.sub(r"#targeted#\n", Targeted, yml)
-    yml = re.sub(r"#attacker#\n", Attacker, yml)
+def select_path(paths):
+    print("Select a Docker build directory:")
+    for idx, path in enumerate(paths, 1):
+        print(f"{idx}. {path.split('/')[-1]}")
+    choice = input("Enter number (or Enter to cancel): ").strip()
+    if (
+        not choice
+        or not choice.isdigit()
+        or int(choice) < 1
+        or int(choice) > len(paths)
+    ):
+        print("[!] Invalid selection or cancelled.")
+        return None
+    return paths[int(choice) - 1]
 
-    with open(os.path.join(path, 'docker-compose.yml'), 'w',encoding="utf-8") as f:
-        f.write(yml)
-    with open(os.path.join(path, 'makefile'), 'w',encoding="utf-8") as f:
-        f.write(makefile)
-    print(
-        f"攻防環境模組已生成。\n\t攻擊機: {args.Attacker:15}x {args.AttackerNum}\n\t靶機  : {args.Targeted:15}x {args.TargetedNum}")
-except Exception as msg:
-    print("攻防環境模組設置錯誤，錯誤原因:",msg)
+
+def build_image(path, image_prefix):
+    # 將 tag 轉為小寫字母
+    tag = f"{image_prefix}_{os.path.basename(path)}".lower()
+    dockerfile_path = os.path.join(path, "Dockerfile")
+    print(f"[*] Building image: {tag}")
+    subprocess.run(
+        ["docker", "build", "-t", tag, path, "-f", dockerfile_path], check=True
+    )
+
+
+def ensure_network():
+    result = subprocess.run(["docker", "network", "ls"], capture_output=True, text=True)
+    if DOCKER_NETWORK not in result.stdout:
+        print(f"[*] Creating network '{DOCKER_NETWORK}'...")
+        subprocess.run(["docker", "network", "create", DOCKER_NETWORK], check=True)
+
+
+def install():
+    ensure_network()
+
+    print("Select what to build:")
+    print("1. Targeted")
+    print("2. Attacker")
+    print("3. All")
+
+    choice = input("Enter your choice (1/2/3): ").strip()
+
+    selected_dirs = []
+    if choice == "1":
+        selected_dirs = [("targeted", BASE_DIRS["Targeted"])]
+    elif choice == "2":
+        selected_dirs = [("attacker", BASE_DIRS["Attacker"])]
+    elif choice == "3":
+        selected_dirs = [
+            ("targeted", BASE_DIRS["Targeted"]),
+            ("attacker", BASE_DIRS["Attacker"]),
+        ]
+    else:
+        print("[!] Invalid choice.")
+        return
+
+    for prefix, path in selected_dirs:
+        docker_paths = find_docker_builds(path)
+        if not docker_paths:
+            print(f"[!] No Dockerfiles found in {path}")
+            continue
+        selected = select_path(docker_paths)
+        if selected:
+            build_image(selected, prefix)
+
+def create_network():
+    print(f"[*] Checking Docker network '{DOCKER_NETWORK}'...")
+    result = subprocess.run(["docker", "network", "ls"], capture_output=True, text=True)
+    if DOCKER_NETWORK not in result.stdout:
+        print(f"[+] Creating Docker network: {DOCKER_NETWORK}")
+        subprocess.run(["docker", "network", "create", DOCKER_NETWORK])
+    else:
+        print("[=] Docker network already exists.")
+
+
+def start():
+    print("[*] Starting containers...")
+    subprocess.run(["docker-compose", "start"])
+
+
+def stop():
+    print("[*] Stopping containers...")
+    subprocess.run(["docker-compose", "stop"])
+
+
+def remove():
+    print("[*] Removing containers and volumes...")
+    subprocess.run(["docker-compose", "down", "-v"])
+
+
+def main():
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("action", choices=["install", "start", "stop", "remove"])
+    args = parser.parse_args()
+
+    actions = {"install": install, "start": start, "stop": stop, "remove": remove}
+
+    actions[args.action]()
+
+
+if __name__ == "__main__":
+    main()

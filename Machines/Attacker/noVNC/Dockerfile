@@ -1,5 +1,12 @@
 FROM kalilinux/kali-rolling:latest
 LABEL maintainer="admin@csalab.id"
+
+# 設定變數
+ARG KALI_USER=kali
+ARG KALI_PASSWORD=kali@123
+ENV KALI_USER=${KALI_USER} \
+    KALI_PASSWORD=${KALI_PASSWORD}
+
 RUN sed -i "s/http.kali.org/mirror.twds.com.tw/g" /etc/apt/sources.list && \
     apt-get update && \
     apt-get -y upgrade
@@ -23,9 +30,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -yq install \
 
 # Install kali-linux-headless, kali-linux-core, kali-linux-default
 RUN DEBIAN_FRONTEND=noninteractive apt-get -yq install \
-    kali-tools-top10 
+    kali-tools-top10 \
+    kali-linux-headless \
     # full-upgrade \
-    # kali-linux-headless \
     # kali-linux-core \
     # kali-linux-default
 
@@ -46,7 +53,7 @@ WORKDIR /home/kali
 RUN mkdir -p /home/kali/.config && \
     virtualenv /home/kali/.config/app && \
     echo "source /home/kali/.config/app/bin/activate" >> /home/kali/.bashrc
-ENV PASSWORD=kalilinux
+ENV PASSWORD=${KALI_PASSWORD}
 ENV SHELL=/bin/bash
 EXPOSE 8080
 ENTRYPOINT ["/bin/bash", "/entrypoint.sh"]

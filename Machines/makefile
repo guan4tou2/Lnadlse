@@ -3,8 +3,8 @@ KALI_USER=kali
 KALI_PASSWORD=kali
 
 install:#build images
-	@if ! docker network ls | grep -q elk; then \
-		docker network create elk; \
+	@if ! docker network ls | grep -q elk_net; then \
+		docker network create elk_net; \
 	fi
 	docker build -t targeted_nginx . -f=./Targeted/nginx
 	sed -i '' 's/ARG KALI_USER=kali/ARG KALI_USER=$(KALI_USER)/g' Attacker/kali-novnc

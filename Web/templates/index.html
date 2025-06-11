@@ -1,33 +1,104 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>容器管理系统</title>
+    <title>Docker 环境管理</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
+    <script
+      type="text/javascript"
+      src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"
+    ></script>
     <style>
-      .container-card {
+      .loading {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+      .loading-content {
+        background: white;
+        padding: 20px;
+        border-radius: 5px;
+        text-align: center;
+      }
+      .spinner-border {
+        width: 3rem;
+        height: 3rem;
+      }
+      .network-card {
         margin-bottom: 20px;
       }
-      .status-running {
-        color: green;
+      .container-item {
+        margin: 5px 0;
+        padding: 5px;
+        background: #f8f9fa;
+        border-radius: 3px;
       }
-      .status-exited {
-        color: red;
+      .cluster-section {
+        margin-bottom: 30px;
+      }
+      .cluster-header {
+        background-color: #f8f9fa;
+        padding: 10px;
+        margin-bottom: 15px;
+        border-radius: 5px;
+      }
+      #networkTopology {
+        width: 100%;
+        height: 600px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #f8f9fa;
+      }
+      .topology-controls {
+        margin-bottom: 15px;
       }
     </style>
   </head>
   <body>
-    <div class="container mt-5">
-      <h1 class="mb-4">容器管理系统</h1>
+    <div class="container mt-4">
+      <h1 class="mb-4">Docker 环境管理</h1>
+
+      <!-- 网络拓扑图 -->
+      <div class="card mb-4">
+        <div
+          class="card-header d-flex justify-content-between align-items-center"
+        >
+          <h5 class="mb-0">网络拓扑图</h5>
+          <div class="topology-controls">
+            <button
+              class="btn btn-sm btn-outline-primary"
+              onclick="updateTopology()"
+            >
+              刷新拓扑图
+            </button>
+            <button
+              class="btn btn-sm btn-outline-secondary"
+              onclick="stabilizeTopology()"
+            >
+              稳定布局
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div id="networkTopology"></div>
+        </div>
+      </div>
 
       <!-- ELK Stack 控制 -->
       <div class="card mb-4">
         <div class="card-header">
-          <h3>ELK Stack 控制</h3>
+          <h5 class="mb-0">ELK Stack 控制</h5>
         </div>
         <div class="card-body">
           <button class="btn btn-primary" onclick="startELK()">
@@ -39,53 +110,216 @@
       <!-- 模拟环境控制 -->
       <div class="card mb-4">
         <div class="card-header">
-          <h3>模拟环境控制</h3>
+          <h5 class="mb-0">模拟环境控制</h5>
         </div>
         <div class="card-body">
-          <div class="row mb-3">
-            <div class="col">
-              <select class="form-select" id="targetType">
-                <option value="">选择目标机器类型</option>
-                <option value="nginx">Nginx 目标机器</option>
-                <option value="httpd">Apache 目标机器</option>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">选择目标类型：</label>
+          <select class="form-select" id="targetType">
+                <option value="nginx">Nginx</option>
+                <option value="httpd">Apache HTTPD</option>
               </select>
             </div>
-            <div class="col">
-              <button class="btn btn-success" onclick="startTarget()">
-                启动目标机器
-              </button>
-            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">选择攻击机器类型：</label>
+              <select class="form-select" id="attackerType">
+                <option value="kali-novnc">Kali Linux (noVNC)</option>
+                <!-- <option value="kali-xrdp">Kali Linux (XRDP)</option>
+                <option value="kali-x11">Kali Linux (X11)</option> -->
+          </select>
+        </div>
           </div>
-          <div class="row">
-            <div class="col">
-              <button class="btn btn-warning" onclick="startAttacker()">
-                启动攻击机器
-              </button>
-            </div>
-          </div>
+          <button class="btn btn-primary" onclick="startSimulation()">
+            启动模拟环境
+          </button>
         </div>
       </div>
 
       <!-- 容器状态 -->
-      <div class="card">
-        <div class="card-header">
-          <h3>容器状态</h3>
+      <div class="card mb-4">
+        <div
+          class="card-header d-flex justify-content-between align-items-center"
+        >
+          <h5 class="mb-0">容器状态</h5>
+          <button
+            class="btn btn-sm btn-outline-primary"
+            onclick="updateContainerStatus()"
+          >
+            刷新
+          </button>
         </div>
         <div class="card-body">
-          <div id="containerList" class="row"></div>
+          <div id="containerList"></div>
+        </div>
+      </div>
+
+      <!-- 网络信息 -->
+      <div class="card mb-4">
+        <div
+          class="card-header d-flex justify-content-between align-items-center"
+        >
+          <h5 class="mb-0">网络信息</h5>
+          <button
+            class="btn btn-sm btn-outline-primary"
+            onclick="updateNetworkStatus()"
+          >
+            刷新
+          </button>
+        </div>
+        <div class="card-body">
+          <div id="networkStatus"></div>
         </div>
       </div>
 
       <!-- 停止所有服务 -->
-      <div class="mt-4">
-        <button class="btn btn-danger" onclick="stopAll()">
-          停止所有服务
-        </button>
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">停止所有服务</h5>
+        </div>
+        <div class="card-body">
+          <button class="btn btn-danger" onclick="stopAll()">
+            停止所有服务
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div class="loading">
+      <div class="loading-content">
+        <div class="spinner-border text-primary mb-3" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <div id="loadingMessage">正在处理...</div>
       </div>
     </div>
 
     <script>
+      let network = null;
+      let nodes = new vis.DataSet([]);
+      let edges = new vis.DataSet([]);
+
+      function initTopology() {
+        const container = document.getElementById("networkTopology");
+        const data = {
+          nodes: nodes,
+          edges: edges,
+        };
+        const options = {
+          nodes: {
+            shape: "dot",
+            size: 30,
+            font: {
+              size: 64,
+              face: "Arial",
+              color: "#000000",
+              strokeWidth: 2,
+              strokeColor: "#ffffff",
+            },
+            borderWidth: 3,
+            shadow: true,
+          },
+          edges: {
+            width: 3,
+            shadow: true,
+            smooth: {
+              type: "continuous",
+            },
+            font: {
+              size: 64,
+              face: "Arial",
+              color: "#000000",
+              strokeWidth: 2,
+              strokeColor: "#ffffff",
+            },
+          },
+          physics: {
+            stabilization: false,
+            barnesHut: {
+              gravitationalConstant: -80000,
+              springConstant: 0.001,
+              springLength: 200,
+            },
+          },
+        };
+        network = new vis.Network(container, data, options);
+      }
+
+      function updateTopology() {
+        showLoading("正在更新拓扑图...");
+        fetch("/api/networks")
+          .then((response) => response.json())
+          .then((networks) => {
+            nodes.clear();
+            edges.clear();
+
+            // 添加网络节点
+            networks.forEach((network) => {
+              nodes.add({
+                id: network.id,
+                label: network.name,
+                group: "network",
+                color: {
+                  background: "#97C2FC",
+                  border: "#2B7CE9",
+                },
+              });
+
+              // 添加容器节点和边
+              network.containers.forEach((container) => {
+                const containerId = `container_${container.id}`;
+                nodes.add({
+                  id: containerId,
+                  label: container.name,
+                  group: container.name.includes("elk") ? "elk" : "simulation",
+                  color: {
+                    background: container.name.includes("elk")
+                      ? "#FFB1B1"
+                      : "#B1FFB1",
+                    border: container.name.includes("elk")
+                      ? "#FF0000"
+                      : "#00FF00",
+                  },
+                });
+
+                edges.add({
+                  from: network.id,
+                  to: containerId,
+                  arrows: "to",
+                });
+              });
+            });
+
+            if (network) {
+              network.stabilize();
+            }
+          })
+          .catch((error) => {
+            console.error("Error updating topology:", error);
+          })
+          .finally(() => {
+            hideLoading();
+          });
+      }
+
+      function stabilizeTopology() {
+        if (network) {
+          network.stabilize();
+        }
+      }
+
+      function showLoading(message) {
+        document.getElementById("loadingMessage").textContent = message;
+        document.querySelector(".loading").style.display = "flex";
+      }
+
+      function hideLoading() {
+        document.querySelector(".loading").style.display = "none";
+      }
+
       function startELK() {
+        showLoading("正在启动 ELK Stack...");
         fetch("/api/start_elk", {
           method: "POST",
         })
@@ -96,22 +330,25 @@
           })
           .catch((error) => {
             alert("Error: " + error);
+          })
+          .finally(() => {
+            hideLoading();
           });
       }
 
-      function startTarget() {
+      function startSimulation() {
         const targetType = document.getElementById("targetType").value;
-        if (!targetType) {
-          alert("请选择目标机器类型");
-          return;
-        }
-
-        fetch("/api/start_target", {
+        const attackerType = document.getElementById("attackerType").value;
+        showLoading("正在启动模拟环境...");
+        fetch("/api/start_simulation", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ type: targetType }),
+          body: JSON.stringify({
+            target_type: targetType,
+            attacker_type: attackerType,
+          }),
         })
           .then((response) => response.json())
           .then((data) => {
@@ -120,24 +357,36 @@
           })
           .catch((error) => {
             alert("Error: " + error);
+          })
+          .finally(() => {
+            hideLoading();
           });
       }
 
-      function startAttacker() {
-        fetch("/api/start_attacker", {
+      function stopContainer(containerId) {
+        showLoading("正在停止容器...");
+        fetch(`/api/containers/${containerId}/stop`, {
           method: "POST",
         })
           .then((response) => response.json())
           .then((data) => {
-            alert(data.message);
-            updateContainerStatus();
+            if (data.success) {
+              updateContainerStatus();
+            } else {
+              alert("停止容器失败: " + data.error);
+            }
           })
           .catch((error) => {
-            alert("Error: " + error);
+            console.error("Error:", error);
+            alert("停止容器失败: " + error.message);
+          })
+          .finally(() => {
+            hideLoading();
           });
       }
 
       function stopAll() {
+        showLoading("正在停止所有服务...");
         fetch("/api/stop_all", {
           method: "POST",
         })
@@ -145,43 +394,205 @@
           .then((data) => {
             alert(data.message);
             updateContainerStatus();
+            updateNetworkStatus();
           })
           .catch((error) => {
             alert("Error: " + error);
+          })
+          .finally(() => {
+            hideLoading();
           });
       }
 
       function updateContainerStatus() {
         fetch("/api/containers")
           .then((response) => response.json())
-          .then((containers) => {
+          .then((data) => {
             const containerList = document.getElementById("containerList");
             containerList.innerHTML = "";
 
-            containers.forEach((container) => {
-              const statusClass = container.status === "running" ? "status-running" : "status-exited";
-              const card = document.createElement("div");
-              card.className = "col-md-4 mb-3";
-              card.innerHTML = `
-                <div class="card">
-                  <div class="card-body">
-                    <h5 class="card-title">${container.name}</h5>
-                    <p class="card-text">
-                      状态: <span class="${statusClass}">${container.status}</span>
-                    </p>
-                  </div>
-                </div>
-              `;
-              containerList.appendChild(card);
+            if (data.length === 0) {
+              containerList.innerHTML =
+                '<div class="text-center text-muted">没有运行中的容器</div>';
+              return;
+            }
+
+            // 按 cluster 字段分组
+            const clusters = {};
+            data.forEach((container) => {
+              if (!clusters[container.cluster]) {
+                clusters[container.cluster] = [];
+              }
+              clusters[container.cluster].push(container);
+            });
+
+            // 定义分组标题
+            const clusterTitles = {
+              elk: "ELK 集群",
+              simulation: "模拟环境集群",
+            };
+
+            // 渲染每个分组
+            Object.keys(clusters).forEach((clusterKey) => {
+              const groupDiv = document.createElement("div");
+              groupDiv.className = "mb-4";
+              // 分组标题
+              const title = document.createElement("h5");
+              title.className = "mb-3 mt-3";
+              title.textContent = clusterTitles[clusterKey] || clusterKey;
+              groupDiv.appendChild(title);
+
+              // 两栏卡片区域
+              const rowDiv = document.createElement("div");
+              rowDiv.className = "row";
+
+              clusters[clusterKey].forEach((container) => {
+                const colDiv = document.createElement("div");
+                colDiv.className = "col-md-6 mb-3";
+
+                const card = document.createElement("div");
+                card.className = "card h-100";
+                // 根据集群类型设置卡片边框颜色
+                if (container.cluster === "elk") {
+                  card.style.borderLeft = "4px solid #28a745";
+                } else if (container.cluster === "simulation") {
+                  card.style.borderLeft = "4px solid #007bff";
+                }
+
+                let statusBadgeClass = "bg-secondary";
+                if (container.status === "running") {
+                  statusBadgeClass = "bg-success";
+                } else if (container.status === "exited") {
+                  statusBadgeClass = "bg-danger";
+                }
+
+                // 构建连接信息HTML
+                let connectionHtml = "";
+                if (container.status === "running" && container.connection) {
+                  connectionHtml = `
+                      <div class="mt-2">
+                          <strong>连接信息:</strong><br>
+                          类型: ${container.connection.type}<br>
+                          地址: <a href="${container.connection.url}" target="_blank">${container.connection.url}</a>
+                  `;
+                  if (container.connection.credentials) {
+                    connectionHtml += `
+                        <br>用户名: ${container.connection.credentials.username}
+                        <br>密码: ${container.connection.credentials.password}
+                    `;
+                  }
+                  connectionHtml += "</div>";
+                }
+
+                card.innerHTML = `
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h5 class="card-title">${container.name}</h5>
+                                <p class="card-text">
+                                    <span class="badge ${statusBadgeClass}">${container.status}</span>
+                                    <small class="text-muted">${container.image}</small>
+                                </p>
+                                <p class="card-text">
+                                    <small class="text-muted">ID: ${container.id}</small>
+                                </p>
+                                ${connectionHtml}
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-danger" onclick="stopContainer('${container.id}')">
+                                    停止
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                colDiv.appendChild(card);
+                rowDiv.appendChild(colDiv);
+              });
+              groupDiv.appendChild(rowDiv);
+              containerList.appendChild(groupDiv);
             });
           })
           .catch((error) => {
-            console.error("Error fetching container status:", error);
+            console.error("Error:", error);
+            const containerList = document.getElementById("containerList");
+            containerList.innerHTML = `
+                <div class="alert alert-danger">
+                    获取容器状态失败: ${error.message}
+                </div>
+            `;
           });
       }
 
-      // 页面加载时更新容器状态
-      document.addEventListener("DOMContentLoaded", updateContainerStatus);
+      function updateNetworkStatus() {
+        showLoading("正在获取网络信息...");
+        fetch("/api/networks")
+          .then((response) => response.json())
+          .then((networks) => {
+            const networkStatus = document.getElementById("networkStatus");
+            if (networks.length === 0) {
+              networkStatus.innerHTML =
+                '<p class="text-muted">没有可用的网络</p>';
+              return;
+            }
+
+            let html = '<div class="row">';
+            networks.forEach((network) => {
+              html += `
+              <div class="col-md-6 mb-3">
+                <div class="card network-card">
+                  <div class="card-body">
+                    <h6 class="card-title">${network.name}</h6>
+                    <p class="card-text">
+                      <small class="text-muted">ID: ${network.id}</small><br>
+                      <small class="text-muted">驱动: ${network.driver}</small>
+                    </p>
+                    <div class="mt-2">
+                      <strong>容器:</strong>
+                      ${
+                        network.containers.length > 0
+                          ? network.containers
+                              .map(
+                                (container) => `
+                          <div class="container-item">
+                            ${container.name} (${container.id})<br>
+                            <small class="text-muted">状态: ${container.status}</small>
+                          </div>
+                        `
+                              )
+                              .join("")
+                          : '<p class="text-muted">没有连接的容器</p>'
+                      }
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `;
+            });
+            html += "</div>";
+            networkStatus.innerHTML = html;
+          })
+          .catch((error) => {
+            document.getElementById(
+              "networkStatus"
+            ).innerHTML = `<div class="alert alert-danger">获取网络信息失败: ${error}</div>`;
+          })
+          .finally(() => {
+            hideLoading();
+          });
+      }
+
+      // 页面加载时初始化
+      document.addEventListener("DOMContentLoaded", function () {
+        initTopology();
+        updateContainerStatus();
+        updateNetworkStatus();
+        updateTopology();
+        // 每30秒自动更新一次状态
+        setInterval(updateContainerStatus, 30000);
+        setInterval(updateNetworkStatus, 30000);
+        setInterval(updateTopology, 30000);
+      });
     </script>
   </body>
 </html>

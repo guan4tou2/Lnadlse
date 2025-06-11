@@ -1,5 +1,6 @@
 FROM httpd:2.4
 MAINTAINER weichen
+# RUN sed -i "s/http.kali.org/mirror.twds.com.tw/g" /etc/apt/sources.list
 RUN apt update && apt upgrade -y && apt install -y make
 COPY ../Beat/packetbeat /home/makefile
 WORKDIR /home/

@@ -5,32 +5,70 @@ services:
     image: targeted_nginx
     container_name: target-nginx
     networks:
-      - simulation_net
+      - elk_net
     ports:
-      - "8080:80"
+      - "80:80"
     depends_on:
-      - attacker
+      - attacker-kali-novnc
 
   target-httpd:
     image: targeted_httpd
     container_name: target-httpd
     networks:
-      - simulation_net
+      - elk_net
     ports:
       - "8081:80"
     depends_on:
-      - attacker
+      - attacker-kali-novnc
 
-  attacker:
+  attacker-kali-novnc:
     image: attacker_kali-novnc
-    container_name: attacker
+    container_name: attacker-kali-novnc
     networks:
-      - simulation_net
+      - elk_net
     ports:
       - "22:22"
-      - "3389:3389"
       - "5901:5901"
-      - "6080:6080"
+      - "8080:8080"
+    privileged: true
+    cap_add:
+      - net_admin
+    tmpfs:
+      - /run
+      - /tmp
+    security_opt:
+      - label:disable
+    volumes:
+      - /dev/net:/dev/net:z
+      - ./data:/data
+
+  attacker-kali-xrdp:
+    image: attacker_kali-xrdp
+    container_name: attacker-kali-xrdp
+    networks:
+      - elk_net
+    ports:
+      - "3390:3389"
+      - "222:22"
+    privileged: true
+    cap_add:
+      - net_admin
+    tmpfs:
+      - /run
+      - /tmp
+    security_opt:
+      - label:disable
+    volumes:
+      - /dev/net:/dev/net:z
+      - ./data:/data
+
+  attacker-kali-x11:
+    image: attacker_kali-x11
+    container_name: attacker-kali-x11
+    networks:
+      - elk_net
+    ports:
+      - "223:22"
     privileged: true
     cap_add:
       - net_admin
@@ -44,5 +82,7 @@ services:
       - ./data:/data
 
 networks:
-  simulation_net:
+  elk_net:
+    name: elk_net 
     driver: bridge 
+    external: true

@@ -7,7 +7,7 @@ services:
       - attacker-1
     container_name: targeted-1
     networks:
-      - elk
+      - elk_net
     ports:
       - "80:80"
 
@@ -15,13 +15,13 @@ services:
     image: attacker_kali-novnc
     container_name: attacker-1
     networks:
-      - elk
+      - elk_net
     ports:
       - "22:22"
       - "3389:3389"
       - "5901:5901"
-      - "6080:6080"
+      - "8080:8080"
 
 networks:
-  elk:
+  elk_net:
     external: true

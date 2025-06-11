@@ -12,6 +12,15 @@ install:
 	sed -i '' 's/ARG KALI_USER=kali/ARG KALI_USER=$(KALI_USER)/g' Attacker/kali-novnc
 	sed -i '' 's/ARG KALI_PASSWORD=kali@123/ARG KALI_PASSWORD=$(KALI_PASSWORD)/g' Attacker/kali-novnc
 	docker build -t attacker_kali-novnc ./Attacker -f=./Attacker/kali-novnc
+
+	sed -i '' 's/ARG KALI_USER=kali/ARG KALI_USER=$(KALI_USER)/g' Attacker/kali-xrdp
+	sed -i '' 's/ARG KALI_PASSWORD=kali@123/ARG KALI_PASSWORD=$(KALI_PASSWORD)/g' Attacker/kali-xrdp
+	docker build -t attacker_kali-xrdp ./Attacker -f=./Attacker/kali-xrdp
+
+	sed -i '' 's/ARG KALI_USER=kali/ARG KALI_USER=$(KALI_USER)/g' Attacker/kali-x11
+	sed -i '' 's/ARG KALI_PASSWORD=kali@123/ARG KALI_PASSWORD=$(KALI_PASSWORD)/g' Attacker/kali-x11
+	docker build -t attacker_kali-x11 ./Attacker -f=./Attacker/kali-x11
+
 	docker-compose -f docker-compose-simulation.yml up -d
 
 start:

@@ -7,8 +7,8 @@ elastic_password=`grep ELASTIC_PASSWORD .env | cut -d '=' -f2`
 install: #setup ELK with existing files
 	@echo "Setting up ELK stack..."
 	@sed -i '' "s/STACK_VERSION=.*/STACK_VERSION=$(elastic_version)/g" .env
-	@if ! docker network ls | grep -q elk; then \
-		docker network create elk; \
+	@if ! docker network ls | grep -q elk_net; then \
+		docker network create elk_net; \
 	fi
 	docker-compose up -d
 	@echo "Waiting for services to initialize..."
@@ -29,11 +29,6 @@ stop:
 check:
 	@echo "Checking Elasticsearch connection..."
 	@curl -s -k https://localhost:9200 -u elastic:$(elastic_password) || echo "Connection failed"
-
-apikey:
-	@echo "Generating Kibana encryption keys..."
-	docker-compose exec kibana bin/kibana-encryption-keys generate | tail -4 | tee kibana/config/kibana.yml 
-	docker restart elk-kibana-1
 
 remove:
 	docker-compose down -v

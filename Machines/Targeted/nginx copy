@@ -1,0 +1,8 @@
+FROM nginx:latest
+MAINTAINER weichen
+RUN sed -i 's|http://deb.debian.org|http://mirror.twds.com.tw|g' /etc/apt/sources.list.d/debian.sources 
+RUN apt update && apt upgrade -y && apt install -y make
+COPY ../Beat/packetbeat /home/makefile
+WORKDIR /home/
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

@@ -12,8 +12,8 @@ install:#build images
 	docker build -t attacker_kali-novnc ./Attacker -f=./Attacker/kali-novnc
 	docker-compose up -d
 	sleep 5
-	sed -i '' "s/kibanaip/`docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' elk-kibana-1`/g" Beat/packetbeat
-	docker exec targeted-1 make
+	# sed -i '' "s/kibanaip/`docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' elk-kibana-1`/g" Beat/packetbeat
+	# docker exec targeted-1 make
 
 start:
 	docker-compose up -d

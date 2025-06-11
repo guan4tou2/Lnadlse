@@ -1,8 +1,30 @@
 FROM nginx:latest
 MAINTAINER weichen
+
+RUN apt update && apt upgrade -y && \
+    apt install -y curl ca-certificates vim supervisor
+
+# 設定台灣鏡像
 RUN sed -i 's|http://deb.debian.org|http://mirror.twds.com.tw|g' /etc/apt/sources.list.d/debian.sources 
-RUN apt update && apt upgrade -y && apt install -y make
-COPY ../Beat/packetbeat /home/makefile
-WORKDIR /home/
+
+# 安裝 packetbeat
+WORKDIR /opt
+RUN curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-9.0.0-linux-arm64.tar.gz && \
+    tar xzvf packetbeat-9.0.0-linux-arm64.tar.gz && \
+    mv packetbeat-9.0.0-linux-arm64 /opt/packetbeat && \
+    cp /opt/packetbeat/packetbeat.yml /opt/packetbeat/packetbeat.yml.bak
+
+# 修改設定
+RUN sed -i '/^output.elasticsearch:/a \  ssl.verification_mode: none' /opt/packetbeat/packetbeat.yml && \
+    sed -i 's/#setup.dashboards.enabled: false/setup.dashboards.enabled: true\nsetup.template.overwrite: false/g' /opt/packetbeat/packetbeat.yml && \
+    sed -i 's/hosts: \["localhost:9200"\]/hosts: \["https:\/\/es01:9200"\]/g' /opt/packetbeat/packetbeat.yml && \
+    sed -i 's/#username: "elastic"/username: "elastic"/g' /opt/packetbeat/packetbeat.yml && \
+    sed -i 's/#password: "changeme"/password: "changeme"/g' /opt/packetbeat/packetbeat.yml && \
+    sed -i 's/#host: "localhost:5601"/host: "kibana:5601"\n  username: "elastic"\n  password: "changeme"/g' /opt/packetbeat/packetbeat.yml
+
+# Supervisor config
+RUN mkdir -p /var/log/supervisor
+COPY Targeted/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["/usr/bin/supervisord", "-n"]

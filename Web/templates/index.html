@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>网络安全模拟环境控制面板</title>
+    <title>Network Security Simulation Environment</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -74,31 +74,31 @@
         <div class="spinner-border text-primary" role="status">
           <span class="visually-hidden">Loading...</span>
         </div>
-        <p class="mt-2 mb-0">请稍候...</p>
+        <p class="mt-2 mb-0">Please wait...</p>
       </div>
     </div>
 
     <div class="container">
-      <h1 class="mb-4">网络安全模拟环境控制面板</h1>
+      <h1 class="mb-4">Network Security Simulation Environment</h1>
 
-      <!-- 网络拓扑图 -->
+      <!-- Network Topology -->
       <div class="card mb-4">
         <div
           class="card-header d-flex justify-content-between align-items-center"
         >
-          <h5 class="mb-0">网络拓扑图</h5>
+          <h5 class="mb-0">Network Topology</h5>
           <div class="topology-controls">
             <button
               class="btn btn-sm btn-outline-primary"
               onclick="updateTopology()"
             >
-              刷新拓扑图
+              Refresh Topology
             </button>
             <button
               class="btn btn-sm btn-outline-secondary"
               onclick="stabilizeTopology()"
             >
-              稳定布局
+              Stabilize Layout
             </button>
           </div>
         </div>
@@ -107,71 +107,75 @@
         </div>
       </div>
 
-      <!-- ELK Stack 控制 -->
+      <!-- ELK Stack Control -->
       <div class="card mb-4">
         <div class="card-header">
-          <h2 class="h5 mb-0">ELK Stack 控制</h2>
+          <h2 class="h5 mb-0">ELK Stack Control</h2>
         </div>
         <div class="card-body">
           <button id="startELK" class="btn btn-primary me-2">
-            启动 ELK Stack
+            Start ELK Stack
           </button>
-          <button id="stopELK" class="btn btn-danger">关闭 ELK Stack</button>
+          <button id="stopELK" class="btn btn-danger">Stop ELK Stack</button>
         </div>
       </div>
 
-      <!-- 模拟环境控制 -->
+      <!-- Simulation Environment Control -->
       <div class="card mb-4">
         <div class="card-header">
-          <h2 class="h5 mb-0">模拟环境控制</h2>
+          <h2 class="h5 mb-0">Simulation Environment Control</h2>
         </div>
         <div class="card-body">
           <div class="row mb-3">
             <div class="col-md-6">
-              <label for="targetType" class="form-label">目标机器类型</label>
+              <label for="targetType" class="form-label"
+                >Target Machine Type</label
+              >
               <select id="targetType" class="form-select">
                 <option value="nginx">Nginx</option>
               </select>
             </div>
             <div class="col-md-6">
-              <label for="attackerType" class="form-label">攻击机器类型</label>
+              <label for="attackerType" class="form-label"
+                >Attacker Machine Type</label
+              >
               <select id="attackerType" class="form-select">
                 <option value="kali-novnc">Kali Linux (noVNC)</option>
               </select>
             </div>
           </div>
           <button id="startSimulation" class="btn btn-primary me-2">
-            启动模拟环境
+            Start Simulation
           </button>
           <button id="stopSimulation" class="btn btn-danger">
-            关闭模拟环境
+            Stop Simulation
           </button>
         </div>
       </div>
 
-      <!-- 容器状态 -->
+      <!-- Container Status -->
       <div class="card">
         <div class="card-header">
-          <h2 class="h5 mb-0">容器状态</h2>
+          <h2 class="h5 mb-0">Container Status</h2>
         </div>
         <div class="card-body">
           <div id="containerList" class="row">
-            <!-- 容器状态将通过 JavaScript 动态添加 -->
+            <!-- Container status will be dynamically added here -->
           </div>
         </div>
       </div>
 
-      <!-- 网络信息 -->
+      <!-- Network Information -->
       <div class="card mb-4">
         <div
           class="card-header d-flex justify-content-between align-items-center"
         >
-          <h5 class="mb-0">网络信息</h5>
+          <h5 class="mb-0">Network Information</h5>
           <button
             class="btn btn-sm btn-outline-primary"
             onclick="updateNetworkStatus()"
           >
-            刷新
+            Refresh
           </button>
         </div>
         <div class="card-body">
@@ -179,14 +183,14 @@
         </div>
       </div>
 
-      <!-- 停止所有服务 -->
+      <!-- Stop All Services -->
       <div class="card mb-4">
         <div class="card-header">
-          <h5 class="mb-0">停止所有服务</h5>
+          <h5 class="mb-0">Stop All Services</h5>
         </div>
         <div class="card-body">
           <button class="btn btn-danger" onclick="stopAll()">
-            停止所有服务
+            Stop All Services
           </button>
         </div>
       </div>
@@ -245,14 +249,14 @@
       }
 
       function updateTopology() {
-        showLoading("正在更新拓扑图...");
+        showLoading("Updating topology...");
         fetch("/api/networks")
           .then((response) => response.json())
           .then((networks) => {
             nodes.clear();
             edges.clear();
 
-            // 添加网络节点
+            // Add network nodes
             networks.forEach((network) => {
               nodes.add({
                 id: network.id,
@@ -264,7 +268,7 @@
                 },
               });
 
-              // 添加容器节点和边
+              // Add container nodes and edges
               network.containers.forEach((container) => {
                 const containerId = `container_${container.id}`;
                 nodes.add({
@@ -311,7 +315,7 @@
         const loading = document.querySelector(".loading");
         const loadingMessage = document.querySelector(".loading-content p");
         if (loading && loadingMessage) {
-          loadingMessage.textContent = message || "请稍候...";
+          loadingMessage.textContent = message || "Please wait...";
           loading.style.display = "flex";
         }
       }
@@ -324,24 +328,24 @@
       }
 
       function startELK() {
-        showLoading("正在启动 ELK Stack...");
+        showLoading("Starting ELK Stack...");
         fetch("/api/start_elk", {
           method: "POST",
         })
           .then((response) => response.json())
           .then((data) => {
             if (data.status === "success") {
-              showAlert("success", "ELK Stack 启动成功");
+              showAlert("success", "ELK Stack started successfully");
             } else if (data.status === "warning") {
               showAlert("warning", data.message);
             } else {
-              showAlert("error", "启动 ELK Stack 失败: " + data.message);
+              showAlert("error", "Failed to start ELK Stack: " + data.message);
             }
             updateContainerStatus();
           })
           .catch((error) => {
             console.error("Error starting ELK Stack:", error);
-            showAlert("error", "启动 ELK Stack 时发生错误: " + error.message);
+            showAlert("error", "Error starting ELK Stack: " + error.message);
           })
           .finally(() => {
             hideLoading();
@@ -351,7 +355,7 @@
       function startSimulation() {
         const targetType = document.getElementById("targetType").value;
         const attackerType = document.getElementById("attackerType").value;
-        showLoading("正在启动模拟环境...");
+        showLoading("Starting simulation environment...");
         fetch("/api/start_simulation", {
           method: "POST",
           headers: {
@@ -367,13 +371,13 @@
             if (data.status === "success") {
               showAlert("success", data.message);
             } else {
-              showAlert("error", "启动模拟环境失败: " + data.message);
+              showAlert("error", "Failed to start simulation: " + data.message);
             }
             updateContainerStatus();
           })
           .catch((error) => {
             console.error("Error starting simulation:", error);
-            showAlert("error", "启动模拟环境时发生错误: " + error.message);
+            showAlert("error", "Error starting simulation: " + error.message);
           })
           .finally(() => {
             hideLoading();
@@ -381,7 +385,7 @@
       }
 
       function stopContainer(containerId) {
-        showLoading("正在停止容器...");
+        showLoading("Stopping container...");
         fetch(`/api/containers/${containerId}/stop`, {
           method: "POST",
         })
@@ -390,12 +394,12 @@
             if (data.success) {
               updateContainerStatus();
             } else {
-              alert("停止容器失败: " + data.error);
+              alert("Failed to stop container: " + data.error);
             }
           })
           .catch((error) => {
             console.error("Error:", error);
-            alert("停止容器失败: " + error.message);
+            alert("Failed to stop container: " + error.message);
           })
           .finally(() => {
             hideLoading();
@@ -403,7 +407,7 @@
       }
 
       function stopAll() {
-        showLoading("正在停止所有服务...");
+        showLoading("Stopping all services...");
         fetch("/api/stop_all", {
           method: "POST",
         })
@@ -422,7 +426,7 @@
       }
 
       function updateContainerStatus() {
-        showLoading("正在获取容器状态...");
+        showLoading("Getting container status...");
         fetch("/api/containers")
           .then((response) => response.json())
           .then((containers) => {
@@ -431,7 +435,7 @@
 
             if (containers.length === 0) {
               containerList.innerHTML =
-                '<div class="text-center text-muted">没有运行中的容器</div>';
+                '<div class="text-center text-muted">No running containers</div>';
               return;
             }
 
@@ -450,15 +454,17 @@
               if (container.connection && container.status === "running") {
                 connectionInfo = `
                   <div class="mt-2">
-                    <strong>连接类型:</strong> ${container.connection.type}<br>
+                    <strong>Connection Type:</strong> ${
+                      container.connection.type
+                    }<br>
                     <strong>URL:</strong> <a href="${
                       container.connection.url
                     }" target="_blank">${container.connection.url}</a><br>
                     ${
                       container.connection.credentials
                         ? `
-                      <strong>用户名:</strong> ${container.connection.credentials.username}<br>
-                      <strong>密码:</strong> ${container.connection.credentials.password}
+                      <strong>Username:</strong> ${container.connection.credentials.username}<br>
+                      <strong>Password:</strong> ${container.connection.credentials.password}
                     `
                         : ""
                     }
@@ -473,7 +479,7 @@
                     <p class="card-text">
                       <span class="badge bg-${statusClass}">${container.status}</span>
                       <br>
-                      <small class="text-muted">镜像: ${container.image}</small>
+                      <small class="text-muted">Image: ${container.image}</small>
                       <br>
                       <small class="text-muted">ID: ${container.id}</small>
                     </p>
@@ -486,7 +492,10 @@
           })
           .catch((error) => {
             console.error("Error updating container status:", error);
-            showAlert("error", "更新容器状态失败: " + error.message);
+            showAlert(
+              "error",
+              "Failed to update container status: " + error.message
+            );
           })
           .finally(() => {
             hideLoading();
@@ -494,14 +503,14 @@
       }
 
       function updateNetworkStatus() {
-        showLoading("正在获取网络信息...");
+        showLoading("Getting network information...");
         fetch("/api/networks")
           .then((response) => response.json())
           .then((networks) => {
             const networkStatus = document.getElementById("networkStatus");
             if (networks.length === 0) {
               networkStatus.innerHTML =
-                '<p class="text-muted">没有可用的网络</p>';
+                '<p class="text-muted">No networks available</p>';
               return;
             }
 
@@ -514,10 +523,12 @@
                     <h6 class="card-title">${network.name}</h6>
                     <p class="card-text">
                       <small class="text-muted">ID: ${network.id}</small><br>
-                      <small class="text-muted">驱动: ${network.driver}</small>
+                      <small class="text-muted">Driver: ${
+                        network.driver
+                      }</small>
                     </p>
                     <div class="mt-2">
-                      <strong>容器:</strong>
+                      <strong>Containers:</strong>
                       ${
                         network.containers.length > 0
                           ? network.containers
@@ -525,12 +536,12 @@
                                 (container) => `
                           <div class="container-item">
                             ${container.name} (${container.id})<br>
-                            <small class="text-muted">状态: ${container.status}</small>
+                            <small class="text-muted">Status: ${container.status}</small>
                           </div>
                         `
                               )
                               .join("")
-                          : '<p class="text-muted">没有连接的容器</p>'
+                          : '<p class="text-muted">No connected containers</p>'
                       }
                     </div>
                   </div>
@@ -544,74 +555,74 @@
           .catch((error) => {
             document.getElementById(
               "networkStatus"
-            ).innerHTML = `<div class="alert alert-danger">获取网络信息失败: ${error}</div>`;
+            ).innerHTML = `<div class="alert alert-danger">Failed to get network information: ${error}</div>`;
           })
           .finally(() => {
             hideLoading();
           });
       }
 
-      // 页面加载时初始化
+      // Initialize on page load
       document.addEventListener("DOMContentLoaded", function () {
         initTopology();
         updateContainerStatus();
         updateNetworkStatus();
         updateTopology();
-        // 每30秒自动更新一次状态
+        // Auto update every 30 seconds
         setInterval(updateContainerStatus, 30000);
         setInterval(updateNetworkStatus, 30000);
         setInterval(updateTopology, 30000);
       });
 
-      // 添加关闭 ELK Stack 的功能
+      // Add stop ELK Stack functionality
       document
         .getElementById("stopELK")
         .addEventListener("click", async function () {
           try {
-            showLoading("正在关闭 ELK Stack...");
+            showLoading("Stopping ELK Stack...");
             const response = await fetch("/api/stop_all", {
               method: "POST",
             });
             const data = await response.json();
             if (data.status === "success") {
-              showAlert("success", "ELK Stack 已关闭");
+              showAlert("success", "ELK Stack stopped");
             } else {
-              showAlert("error", "关闭 ELK Stack 失败: " + data.message);
+              showAlert("error", "Failed to stop ELK Stack: " + data.message);
             }
           } catch (error) {
             console.error("Error stopping ELK Stack:", error);
-            showAlert("error", "关闭 ELK Stack 时发生错误: " + error.message);
+            showAlert("error", "Error stopping ELK Stack: " + error.message);
           } finally {
             hideLoading();
             updateContainerStatus();
           }
         });
 
-      // 添加关闭模拟环境的功能
+      // Add stop simulation functionality
       document
         .getElementById("stopSimulation")
         .addEventListener("click", async function () {
           try {
-            showLoading("正在关闭模拟环境...");
+            showLoading("Stopping simulation environment...");
             const response = await fetch("/api/stop_all", {
               method: "POST",
             });
             const data = await response.json();
             if (data.status === "success") {
-              showAlert("success", "模拟环境已关闭");
+              showAlert("success", "Simulation environment stopped");
             } else {
-              showAlert("error", "关闭模拟环境失败: " + data.message);
+              showAlert("error", "Failed to stop simulation: " + data.message);
             }
           } catch (error) {
             console.error("Error stopping simulation:", error);
-            showAlert("error", "关闭模拟环境时发生错误: " + error.message);
+            showAlert("error", "Error stopping simulation: " + error.message);
           } finally {
             hideLoading();
             updateContainerStatus();
           }
         });
 
-      // 显示提示信息
+      // Show alert message
       function showAlert(type, message) {
         const alertDiv = document.createElement("div");
         alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
@@ -621,11 +632,11 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         `;
 
-        // 移除之前的提示
+        // Remove previous alerts
         const existingAlerts = document.querySelectorAll(".alert");
         existingAlerts.forEach((alert) => alert.remove());
 
-        // 添加新提示
+        // Add new alert
         document
           .querySelector(".container")
           .insertBefore(
@@ -633,7 +644,7 @@
             document.querySelector(".container").firstChild
           );
 
-        // 5秒后自动关闭
+        // Auto close after 5 seconds
         setTimeout(() => {
           if (alertDiv && alertDiv.parentNode) {
             alertDiv.remove();

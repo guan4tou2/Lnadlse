@@ -347,7 +347,7 @@ def check_elk_status(max_retries=5, retry_delay=10):
             #     return False, "无法获取 Elasticsearch IP"
 
             # 检查 Elasticsearch 是否运行
-            es_url = f"https://es01:9200"
+            es_url = "https://es01:9200"
             print(f"检查 Elasticsearch: {es_url}")
             es_response = requests.get(
                 es_url, auth=("elastic", ELASTIC_PASSWORD), verify=False, timeout=10
@@ -381,11 +381,11 @@ def check_elk_status(max_retries=5, retry_delay=10):
             #     print("无法获取 Kibana IP")
             #     if attempt < max_retries - 1:
             #         time.sleep(retry_delay)
-                #     continue
-                # return False, "无法获取 Kibana IP"
+            #     continue
+            # return False, "无法获取 Kibana IP"
 
             # 检查 Kibana 是否运行
-            kibana_url = f"http://kibana:5601"
+            kibana_url = "http://kibana:5601"
             print(f"检查 Kibana: {kibana_url}")
             kibana_response = requests.get(kibana_url, timeout=10)
             if kibana_response.status_code != 200:
@@ -497,17 +497,27 @@ def stop_all():
     try:
         # Stop ELK
         elk_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "ELK")
-        subprocess.run(["docker-compose", "down"], cwd=elk_dir, check=True)
+        subprocess.run(["docker-compose", "down", "-v"], cwd=elk_dir, check=True)
 
         # Stop simulation environment
         machines_dir = os.path.join(
             os.path.dirname(os.path.dirname(__file__)), "Machines"
         )
         subprocess.run(
-            ["docker-compose", "-f", "docker-compose-simulation.yml", "down"],
+            ["docker-compose", "-f", "docker-compose-simulation.yml", "down", "-v"],
             cwd=machines_dir,
             check=True,
         )
+
+        # Force stop any remaining containers
+        client = docker.from_env()
+        containers = client.containers.list(all=True)
+        for container in containers:
+            try:
+                container.stop()
+                container.remove()
+            except Exception as e:
+                print(f"Error stopping container {container.name}: {e}")
 
         return jsonify(
             {"status": "success", "message": "All services stopped successfully"}

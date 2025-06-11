@@ -1,4 +1,4 @@
-.PHONY: install start stop check apikey remove show
+.PHONY: install start stop check remove show
 kibanaip=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' elk-kibana-1`
 esip=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' elk-es01-1`
 elastic_version=9.0.0

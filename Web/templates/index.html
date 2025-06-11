@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Docker 环境管理</title>
+    <title>网络安全模拟环境控制面板</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -19,14 +19,14 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.5);
+        background-color: rgba(0, 0, 0, 0.5);
         display: none;
         justify-content: center;
         align-items: center;
-        z-index: 1000;
+        z-index: 9999;
       }
       .loading-content {
-        background: white;
+        background-color: white;
         padding: 20px;
         border-radius: 5px;
         text-align: center;
@@ -63,11 +63,23 @@
       .topology-controls {
         margin-bottom: 15px;
       }
+      .container {
+        margin-top: 20px;
+      }
     </style>
   </head>
   <body>
-    <div class="container mt-4">
-      <h1 class="mb-4">Docker 环境管理</h1>
+    <div class="loading">
+      <div class="loading-content">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2 mb-0">请稍候...</p>
+      </div>
+    </div>
+
+    <div class="container">
+      <h1 class="mb-4">网络安全模拟环境控制面板</h1>
 
       <!-- 网络拓扑图 -->
       <div class="card mb-4">
@@ -98,59 +110,57 @@
       <!-- ELK Stack 控制 -->
       <div class="card mb-4">
         <div class="card-header">
-          <h5 class="mb-0">ELK Stack 控制</h5>
+          <h2 class="h5 mb-0">ELK Stack 控制</h2>
         </div>
         <div class="card-body">
-          <button class="btn btn-primary" onclick="startELK()">
+          <button id="startELK" class="btn btn-primary me-2">
             启动 ELK Stack
           </button>
+          <button id="stopELK" class="btn btn-danger">关闭 ELK Stack</button>
         </div>
       </div>
 
       <!-- 模拟环境控制 -->
       <div class="card mb-4">
         <div class="card-header">
-          <h5 class="mb-0">模拟环境控制</h5>
+          <h2 class="h5 mb-0">模拟环境控制</h2>
         </div>
         <div class="card-body">
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label class="form-label">选择目标类型：</label>
-          <select class="form-select" id="targetType">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="targetType" class="form-label">目标机器类型</label>
+              <select id="targetType" class="form-select">
                 <option value="nginx">Nginx</option>
                 <option value="httpd">Apache HTTPD</option>
               </select>
             </div>
-            <div class="col-md-6 mb-3">
-              <label class="form-label">选择攻击机器类型：</label>
-              <select class="form-select" id="attackerType">
+            <div class="col-md-6">
+              <label for="attackerType" class="form-label">攻击机器类型</label>
+              <select id="attackerType" class="form-select">
                 <option value="kali-novnc">Kali Linux (noVNC)</option>
-                <!-- <option value="kali-xrdp">Kali Linux (XRDP)</option>
-                <option value="kali-x11">Kali Linux (X11)</option> -->
-          </select>
-        </div>
+                <option value="kali-xrdp">Kali Linux (XRDP)</option>
+                <option value="kali-x11">Kali Linux (X11)</option>
+              </select>
+            </div>
           </div>
-          <button class="btn btn-primary" onclick="startSimulation()">
+          <button id="startSimulation" class="btn btn-primary me-2">
             启动模拟环境
+          </button>
+          <button id="stopSimulation" class="btn btn-danger">
+            关闭模拟环境
           </button>
         </div>
       </div>
 
       <!-- 容器状态 -->
-      <div class="card mb-4">
-        <div
-          class="card-header d-flex justify-content-between align-items-center"
-        >
-          <h5 class="mb-0">容器状态</h5>
-          <button
-            class="btn btn-sm btn-outline-primary"
-            onclick="updateContainerStatus()"
-          >
-            刷新
-          </button>
+      <div class="card">
+        <div class="card-header">
+          <h2 class="h5 mb-0">容器状态</h2>
         </div>
         <div class="card-body">
-          <div id="containerList"></div>
+          <div id="containerList" class="row">
+            <!-- 容器状态将通过 JavaScript 动态添加 -->
+          </div>
         </div>
       </div>
 
@@ -185,16 +195,7 @@
       </div>
     </div>
 
-    <!-- Loading Indicator -->
-    <div class="loading">
-      <div class="loading-content">
-        <div class="spinner-border text-primary mb-3" role="status">
-          <span class="visually-hidden">Loading...</span>
-        </div>
-        <div id="loadingMessage">正在处理...</div>
-      </div>
-    </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
       let network = null;
       let nodes = new vis.DataSet([]);
@@ -310,12 +311,19 @@
       }
 
       function showLoading(message) {
-        document.getElementById("loadingMessage").textContent = message;
-        document.querySelector(".loading").style.display = "flex";
+        const loading = document.querySelector(".loading");
+        const loadingMessage = document.querySelector(".loading-content p");
+        if (loading && loadingMessage) {
+          loadingMessage.textContent = message || "请稍候...";
+          loading.style.display = "flex";
+        }
       }
 
       function hideLoading() {
-        document.querySelector(".loading").style.display = "none";
+        const loading = document.querySelector(".loading");
+        if (loading) {
+          loading.style.display = "none";
+        }
       }
 
       function startELK() {
@@ -325,11 +333,18 @@
         })
           .then((response) => response.json())
           .then((data) => {
-            alert(data.message);
+            if (data.status === "success") {
+              showAlert("success", "ELK Stack 启动成功");
+            } else if (data.status === "warning") {
+              showAlert("warning", data.message);
+            } else {
+              showAlert("error", "启动 ELK Stack 失败: " + data.message);
+            }
             updateContainerStatus();
           })
           .catch((error) => {
-            alert("Error: " + error);
+            console.error("Error starting ELK Stack:", error);
+            showAlert("error", "启动 ELK Stack 时发生错误: " + error.message);
           })
           .finally(() => {
             hideLoading();
@@ -352,11 +367,16 @@
         })
           .then((response) => response.json())
           .then((data) => {
-            alert(data.message);
+            if (data.status === "success") {
+              showAlert("success", data.message);
+            } else {
+              showAlert("error", "启动模拟环境失败: " + data.message);
+            }
             updateContainerStatus();
           })
           .catch((error) => {
-            alert("Error: " + error);
+            console.error("Error starting simulation:", error);
+            showAlert("error", "启动模拟环境时发生错误: " + error.message);
           })
           .finally(() => {
             hideLoading();
@@ -405,122 +425,74 @@
       }
 
       function updateContainerStatus() {
+        showLoading("正在获取容器状态...");
         fetch("/api/containers")
           .then((response) => response.json())
-          .then((data) => {
+          .then((containers) => {
             const containerList = document.getElementById("containerList");
             containerList.innerHTML = "";
 
-            if (data.length === 0) {
+            if (containers.length === 0) {
               containerList.innerHTML =
                 '<div class="text-center text-muted">没有运行中的容器</div>';
               return;
             }
 
-            // 按 cluster 字段分组
-            const clusters = {};
-            data.forEach((container) => {
-              if (!clusters[container.cluster]) {
-                clusters[container.cluster] = [];
+            containers.forEach((container) => {
+              const card = document.createElement("div");
+              card.className = "col-md-4 mb-3";
+
+              let statusClass = "secondary";
+              if (container.status === "running") {
+                statusClass = "success";
+              } else if (container.status === "exited") {
+                statusClass = "danger";
               }
-              clusters[container.cluster].push(container);
-            });
 
-            // 定义分组标题
-            const clusterTitles = {
-              elk: "ELK 集群",
-              simulation: "模拟环境集群",
-            };
-
-            // 渲染每个分组
-            Object.keys(clusters).forEach((clusterKey) => {
-              const groupDiv = document.createElement("div");
-              groupDiv.className = "mb-4";
-              // 分组标题
-              const title = document.createElement("h5");
-              title.className = "mb-3 mt-3";
-              title.textContent = clusterTitles[clusterKey] || clusterKey;
-              groupDiv.appendChild(title);
-
-              // 两栏卡片区域
-              const rowDiv = document.createElement("div");
-              rowDiv.className = "row";
-
-              clusters[clusterKey].forEach((container) => {
-                const colDiv = document.createElement("div");
-                colDiv.className = "col-md-6 mb-3";
-
-                const card = document.createElement("div");
-                card.className = "card h-100";
-                // 根据集群类型设置卡片边框颜色
-                if (container.cluster === "elk") {
-                  card.style.borderLeft = "4px solid #28a745";
-                } else if (container.cluster === "simulation") {
-                  card.style.borderLeft = "4px solid #007bff";
-                }
-
-                let statusBadgeClass = "bg-secondary";
-                if (container.status === "running") {
-                  statusBadgeClass = "bg-success";
-                } else if (container.status === "exited") {
-                  statusBadgeClass = "bg-danger";
-                }
-
-                // 构建连接信息HTML
-                let connectionHtml = "";
-                if (container.status === "running" && container.connection) {
-                  connectionHtml = `
-                      <div class="mt-2">
-                          <strong>连接信息:</strong><br>
-                          类型: ${container.connection.type}<br>
-                          地址: <a href="${container.connection.url}" target="_blank">${container.connection.url}</a>
-                  `;
-                  if (container.connection.credentials) {
-                    connectionHtml += `
-                        <br>用户名: ${container.connection.credentials.username}
-                        <br>密码: ${container.connection.credentials.password}
-                    `;
-                  }
-                  connectionHtml += "</div>";
-                }
-
-                card.innerHTML = `
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h5 class="card-title">${container.name}</h5>
-                                <p class="card-text">
-                                    <span class="badge ${statusBadgeClass}">${container.status}</span>
-                                    <small class="text-muted">${container.image}</small>
-                                </p>
-                                <p class="card-text">
-                                    <small class="text-muted">ID: ${container.id}</small>
-                                </p>
-                                ${connectionHtml}
-                            </div>
-                            <div>
-                                <button class="btn btn-sm btn-danger" onclick="stopContainer('${container.id}')">
-                                    停止
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+              let connectionInfo = "";
+              if (container.connection && container.status === "running") {
+                connectionInfo = `
+                  <div class="mt-2">
+                    <strong>连接类型:</strong> ${container.connection.type}<br>
+                    <strong>URL:</strong> <a href="${
+                      container.connection.url
+                    }" target="_blank">${container.connection.url}</a><br>
+                    ${
+                      container.connection.credentials
+                        ? `
+                      <strong>用户名:</strong> ${container.connection.credentials.username}<br>
+                      <strong>密码:</strong> ${container.connection.credentials.password}
+                    `
+                        : ""
+                    }
+                  </div>
                 `;
-                colDiv.appendChild(card);
-                rowDiv.appendChild(colDiv);
-              });
-              groupDiv.appendChild(rowDiv);
-              containerList.appendChild(groupDiv);
+              }
+
+              card.innerHTML = `
+                <div class="card">
+                  <div class="card-body">
+                    <h5 class="card-title">${container.name}</h5>
+                    <p class="card-text">
+                      <span class="badge bg-${statusClass}">${container.status}</span>
+                      <br>
+                      <small class="text-muted">镜像: ${container.image}</small>
+                      <br>
+                      <small class="text-muted">ID: ${container.id}</small>
+                    </p>
+                    ${connectionInfo}
+                  </div>
+                </div>
+              `;
+              containerList.appendChild(card);
             });
           })
           .catch((error) => {
-            console.error("Error:", error);
-            const containerList = document.getElementById("containerList");
-            containerList.innerHTML = `
-                <div class="alert alert-danger">
-                    获取容器状态失败: ${error.message}
-                </div>
-            `;
+            console.error("Error updating container status:", error);
+            showAlert("error", "更新容器状态失败: " + error.message);
+          })
+          .finally(() => {
+            hideLoading();
           });
       }
 
@@ -593,6 +565,84 @@
         setInterval(updateNetworkStatus, 30000);
         setInterval(updateTopology, 30000);
       });
+
+      // 添加关闭 ELK Stack 的功能
+      document
+        .getElementById("stopELK")
+        .addEventListener("click", async function () {
+          try {
+            showLoading("正在关闭 ELK Stack...");
+            const response = await fetch("/api/stop_all", {
+              method: "POST",
+            });
+            const data = await response.json();
+            if (data.status === "success") {
+              showAlert("success", "ELK Stack 已关闭");
+            } else {
+              showAlert("error", "关闭 ELK Stack 失败: " + data.message);
+            }
+          } catch (error) {
+            console.error("Error stopping ELK Stack:", error);
+            showAlert("error", "关闭 ELK Stack 时发生错误: " + error.message);
+          } finally {
+            hideLoading();
+            updateContainerStatus();
+          }
+        });
+
+      // 添加关闭模拟环境的功能
+      document
+        .getElementById("stopSimulation")
+        .addEventListener("click", async function () {
+          try {
+            showLoading("正在关闭模拟环境...");
+            const response = await fetch("/api/stop_all", {
+              method: "POST",
+            });
+            const data = await response.json();
+            if (data.status === "success") {
+              showAlert("success", "模拟环境已关闭");
+            } else {
+              showAlert("error", "关闭模拟环境失败: " + data.message);
+            }
+          } catch (error) {
+            console.error("Error stopping simulation:", error);
+            showAlert("error", "关闭模拟环境时发生错误: " + error.message);
+          } finally {
+            hideLoading();
+            updateContainerStatus();
+          }
+        });
+
+      // 显示提示信息
+      function showAlert(type, message) {
+        const alertDiv = document.createElement("div");
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+        alertDiv.role = "alert";
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+
+        // 移除之前的提示
+        const existingAlerts = document.querySelectorAll(".alert");
+        existingAlerts.forEach((alert) => alert.remove());
+
+        // 添加新提示
+        document
+          .querySelector(".container")
+          .insertBefore(
+            alertDiv,
+            document.querySelector(".container").firstChild
+          );
+
+        // 5秒后自动关闭
+        setTimeout(() => {
+          if (alertDiv && alertDiv.parentNode) {
+            alertDiv.remove();
+          }
+        }, 5000);
+      }
     </script>
   </body>
 </html>

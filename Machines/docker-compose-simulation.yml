@@ -11,8 +11,6 @@ services:
       - elk_net
     ports:
       - "80:80"
-    depends_on:
-      - attacker-kali-novnc
 
   target-httpd:
     build:
@@ -24,8 +22,6 @@ services:
       - elk_net
     ports:
       - "8081:80"
-    depends_on:
-      - attacker-kali-novnc
 
   attacker-kali-novnc:
     build:

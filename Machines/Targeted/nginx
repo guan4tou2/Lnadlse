@@ -41,7 +41,7 @@ RUN sed -i '/^output.elasticsearch:/a \  ssl.verification_mode: none' /opt/fileb
 
 RUN cd /opt/filebeat && ./filebeat modules enable nginx
 RUN rm /var/log/nginx/access.log /var/log/nginx/error.log && \
-touch /var/log/nginx/access.log /var/log/nginx/error.log
+    touch /var/log/nginx/access.log /var/log/nginx/error.log
 
 # 啟用 access.enabled
 RUN sed -i '/^\s*access:/,/^\s*[a-z_]*:/s/^\(\s*enabled:\).*/\1 true/' /opt/filebeat/modules.d/nginx.yml
@@ -55,7 +55,7 @@ RUN sed -i '/^\s*error:/,/^\s*[a-z_]*:/s/^\(\s*enabled:\).*/\1 true/' /opt/fileb
 
 # Supervisor config
 RUN mkdir -p /var/log/supervisor
-COPY Targeted/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 EXPOSE 80
 CMD ["/usr/bin/supervisord", "-n"]

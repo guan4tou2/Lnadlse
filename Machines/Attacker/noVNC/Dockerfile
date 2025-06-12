@@ -3,7 +3,7 @@ LABEL maintainer="admin@csalab.id"
 
 # 設定變數
 ARG KALI_USER=kali
-ARG KALI_PASSWORD=kali@123
+ARG KALI_PASSWORD=kalilinux
 ENV KALI_USER=${KALI_USER} \
     KALI_PASSWORD=${KALI_PASSWORD}
 
@@ -30,11 +30,11 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -yq install \
     kali-desktop-xfce 
 
 # Install kali-linux-headless, kali-linux-core, kali-linux-default
-RUN DEBIAN_FRONTEND=noninteractive apt-get -yq install \
-    kali-tools-top10 \
+# RUN DEBIAN_FRONTEND=noninteractive apt-get -yq install \
+#     kali-tools-top10 \
     # kali-linux-headless \
-    kali-linux-core \
-    kali-linux-default
+    # kali-linux-core \
+    # kali-linux-default
 
 # RUN DEBIAN_FRONTEND=noninteractive apt-get -yq full-upgrade
 
@@ -49,14 +49,14 @@ RUN apt-get -y autoremove && \
     # ln -s /usr/bin/python3 /usr/bin/python && \
     touch /usr/share/novnc/index.htm
 COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+RUN dos2unix /entrypoint.sh && \
+    chmod +x /entrypoint.sh
 USER kali
 WORKDIR /home/kali
 RUN mkdir -p /home/kali/.config && \
     virtualenv /home/kali/.config/app && \
     echo "source /home/kali/.config/app/bin/activate" >> /home/kali/.bashrc
 
-RUN dos2unix /entrypoint.sh
 ENV PASSWORD=${KALI_PASSWORD}
 ENV SHELL=/bin/bash
 EXPOSE 8080

@@ -52,7 +52,10 @@ def build_image(path, image_prefix):
     arch = get_system_architecture()
 
     # Convert tag to lowercase
-    tag = f"{image_prefix}_{os.path.basename(path)}".lower()
+    if image_prefix == "attacker":
+        tag = f"{image_prefix}-kali-{os.path.basename(path)}".lower()
+    else:
+        tag = f"{image_prefix}-{os.path.basename(path)}".lower()
     dockerfile_path = os.path.join(path, "Dockerfile")
 
     # Check if Dockerfile exists

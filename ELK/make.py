@@ -68,7 +68,13 @@ def install():
 
     print("[*] Setted ELK stack")
     print("[*] Run 'start' to start the stack")
-    # subprocess.run(["docker-compose", "build"])
+
+    image_names = [f"docker.elastic.co/elasticsearch/elasticsearch:{ELASTIC_VERSION}", f"docker.elastic.co/kibana/kibana:{ELASTIC_VERSION}"]
+    for image_name in image_names:
+        if not subprocess.run(["docker", "images", "-q", image_name], capture_output=True, text=True).stdout.strip():
+            print(f"[*] Pulling {image_name} image...")
+            subprocess.run(["docker", "pull", image_name])
+            print(f"[*] {image_name} image pulled")
 
 
 def show():

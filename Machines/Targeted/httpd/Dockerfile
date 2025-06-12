@@ -10,9 +10,9 @@ RUN sed -i 's|http://deb.debian.org|http://mirror.twds.com.tw|g' /etc/apt/source
 
 # 安裝 Packetbeat
 WORKDIR /opt
-RUN curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-9.0.0-linux-arm64.tar.gz && \
-    tar xzvf packetbeat-9.0.0-linux-arm64.tar.gz && \
-    mv packetbeat-9.0.0-linux-arm64 /opt/packetbeat && \
+RUN curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-9.0.0-linux-replacearch.tar.gz && \
+    tar xzvf packetbeat-9.0.0-linux-replacearch.tar.gz && \
+    mv packetbeat-9.0.0-linux-replacearch /opt/packetbeat && \
     cp /opt/packetbeat/packetbeat.yml /opt/packetbeat/packetbeat.yml.bak
 
 # 修改 Packetbeat 設定
@@ -25,9 +25,9 @@ RUN sed -i '/^output.elasticsearch:/a \  ssl.verification_mode: none' /opt/packe
 
 # 安裝 Filebeat
 WORKDIR /opt
-RUN curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-9.0.0-linux-arm64.tar.gz && \
-    tar xzvf filebeat-9.0.0-linux-arm64.tar.gz && \
-    mv filebeat-9.0.0-linux-arm64 /opt/filebeat && \
+RUN curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-9.0.0-linux-replacearch.tar.gz && \
+    tar xzvf filebeat-9.0.0-linux-replacearch.tar.gz && \
+    mv filebeat-9.0.0-linux-replacearch /opt/filebeat && \
     cp /opt/filebeat/filebeat.yml /opt/filebeat/filebeat.yml.bak
 
 # 修改 Filebeat 設定

@@ -71,10 +71,10 @@ def build_image(path, image_prefix):
 
         # Replace packetbeat architecture
         content = content.replace(
-            "packetbeat-9.0.0-linux-arm64", f"packetbeat-9.0.0-linux-{arch}"
+            "packetbeat-9.0.0-linux-replacearch", f"packetbeat-9.0.0-linux-{arch}"
         )
         content = content.replace(
-            "filebeat-9.0.0-linux-arm64", f"filebeat-9.0.0-linux-{arch}"
+            "filebeat-9.0.0-linux-replacearch", f"filebeat-9.0.0-linux-{arch}"
         )
 
         with open(temp_dockerfile, "w", encoding="utf-8") as f:

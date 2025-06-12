@@ -213,9 +213,9 @@ def get_containers():
                     ip = ip_addresses.get(
                         "elk_net", next(iter(ip_addresses.values()), "N/A")
                     )
-                    platform = sys.platform
-                    if platform == "win32":
-                        ip = "localhost"
+                    # platform = sys.platform
+                    # if platform == "win32":
+                    #     ip = "localhost"
                     if ip != "N/A":
                         connection = {
                             "type": template["type"],

@@ -31,10 +31,11 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -yq install \
 # Install kali-linux-headless, kali-linux-core, kali-linux-default
 RUN DEBIAN_FRONTEND=noninteractive apt-get -yq install \
     kali-tools-top10 \
-    kali-linux-headless \
-    # full-upgrade \
-    # kali-linux-core \
-    # kali-linux-default
+    # kali-linux-headless \
+    kali-linux-core \
+    kali-linux-default
+
+# RUN DEBIAN_FRONTEND=noninteractive apt-get -yq full-upgrade
 
 RUN apt-get -y autoremove && \
     apt-get clean all && \
@@ -44,7 +45,7 @@ RUN apt-get -y autoremove && \
     sed -i "s/off/remote/g" /usr/share/novnc/app/ui.js && \
     echo "kali ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
     mkdir /run/dbus && \
-    ln -s /usr/bin/python3 /usr/bin/python && \
+    # ln -s /usr/bin/python3 /usr/bin/python && \
     touch /usr/share/novnc/index.htm
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

@@ -3,8 +3,8 @@ version: "3.8"
 services:
   target-nginx:
     build:
-      context: ./Targeted
-      dockerfile: nginx
+      context: ./Targeted/nginx
+      dockerfile: Dockerfile
     image: targeted_nginx
     container_name: target-nginx
     networks:
@@ -14,8 +14,8 @@ services:
 
   target-httpd:
     build:
-      context: ./Targeted
-      dockerfile: httpd
+      context: ./Targeted/httpd
+      dockerfile: Dockerfile
     image: targeted_httpd
     container_name: target-httpd
     networks:
@@ -25,8 +25,8 @@ services:
 
   attacker-kali-novnc:
     build:
-      context: ./Attacker
-      dockerfile: kali-novnc
+      context: ./Attacker/novnc
+      dockerfile: Dockerfile
     image: attacker_kali-novnc
     container_name: attacker-kali-novnc
     networks:
@@ -49,8 +49,8 @@ services:
 
   attacker-kali-xrdp:
     build:
-      context: ./Attacker
-      dockerfile: kali-xrdp
+      context: ./Attacker/xrdp
+      dockerfile: Dockerfile
     image: attacker_kali-xrdp
     container_name: attacker-kali-xrdp
     networks:
@@ -72,8 +72,8 @@ services:
 
   attacker-kali-x11:
     build:
-      context: ./Attacker
-      dockerfile: kali-x11
+      context: ./Attacker/x11
+      dockerfile: Dockerfile
     image: attacker_kali-x11
     container_name: attacker-kali-x11
     networks:
@@ -97,4 +97,3 @@ networks:
     name: elk_net
     driver: bridge
     external: true
- 

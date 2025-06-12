@@ -326,36 +326,6 @@ def get_elasticsearch_ip():
         return None
 
 
-def update_packetbeat_config(es_ip):
-    """Update packetbeat configuration"""
-    try:
-        # Get packetbeat.yml file path
-        beat_dir = os.path.join(
-            os.path.dirname(os.path.dirname(__file__)), "Machines", "Beat"
-        )
-        packetbeat_path = os.path.join(beat_dir, "packetbeat.yml")
-
-        # Read configuration file
-        with open(packetbeat_path, "r") as f:
-            content = f.read()
-
-        # Update Elasticsearch host address
-        content = re.sub(
-            r'hosts: \[".*?"\]', f'hosts: ["https://{es_ip}:9200"]', content
-        )
-
-        # Update username
-        content = re.sub(r'#username: "elastic"', 'username: "elastic"', content)
-
-        # Write updated configuration
-        with open(packetbeat_path, "w") as f:
-            f.write(content)
-
-        return True, "Packetbeat configuration updated successfully"
-    except Exception as e:
-        return False, f"Failed to update packetbeat configuration: {str(e)}"
-
-
 def check_elk_status(max_retries=5, retry_delay=10):
     """Check if ELK environment is running properly, with retry mechanism"""
     for attempt in range(max_retries):
@@ -436,16 +406,6 @@ def check_elk_status(max_retries=5, retry_delay=10):
                     "code": "KIBANA_NOT_READY",
                     "message": "Kibana not running properly",
                     "details": f"Status code: {kibana_response.status_code}, Response: {kibana_response.text}",
-                }
-
-            # Update packetbeat configuration
-            update_success, update_message = update_packetbeat_config(es_ip)
-            if not update_success:
-                print(f"Warning: {update_message}")
-                return False, {
-                    "code": "PACKETBEAT_CONFIG_FAILED",
-                    "message": "Failed to update packetbeat configuration",
-                    "details": update_message,
                 }
 
             return True, {

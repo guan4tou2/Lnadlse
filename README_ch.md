@@ -129,6 +129,9 @@ python make.py remove
    - 確認已經正確構建了所需的 Docker 鏡像
    - 查看容器日誌獲取詳細信息
 
+# 示範截圖
+![img](img/Lnadlse.png)
+
 ## 貢獻指南
 
 歡迎提交 Issue 和 Pull Request 來幫助改進專案。

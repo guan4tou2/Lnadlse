@@ -129,6 +129,9 @@ python make.py remove
    - Verify that all required Docker images are built correctly
    - Check container logs for detailed information
 
+# Screenshot
+![img](img/Lnadlse.png)
+
 ## Contributing
 
 Issues and Pull Requests are welcome to help improve the project.

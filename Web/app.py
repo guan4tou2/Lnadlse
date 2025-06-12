@@ -310,22 +310,6 @@ def get_docker_compose_command():
                 "Neither 'docker compose' plugin nor 'docker-compose' command found"
             )
 
-
-def get_elasticsearch_ip():
-    """Get Elasticsearch container IP address"""
-    try:
-        client = docker.from_env()
-        container = client.containers.get("elk-es01-1")
-        networks = container.attrs.get("NetworkSettings", {}).get("Networks", {})
-        for network_name, network_info in networks.items():
-            if network_name == "elk_net":
-                return network_info.get("IPAddress")
-        return None
-    except Exception as e:
-        print(f"Failed to get Elasticsearch IP: {str(e)}")
-        return None
-
-
 def check_elk_status(max_retries=5, retry_delay=10):
     """Check if ELK environment is running properly, with retry mechanism"""
     for attempt in range(max_retries):
@@ -333,7 +317,27 @@ def check_elk_status(max_retries=5, retry_delay=10):
             print(f"Checking ELK environment (Attempt {attempt + 1})")
 
             # Get Elasticsearch IP
-            es_ip = get_elasticsearch_ip()
+            try:
+                es_container = client.containers.get("elk-es01-1")
+                es_networks = es_container.attrs.get("NetworkSettings", {}).get(
+                    "Networks", {}
+                )
+                es_ip = next(
+                    (
+                        info.get("IPAddress")
+                        for name, info in es_networks.items()
+                        if name == "elk_net"
+                    ),
+                    None,
+                )
+            except Exception as e:
+                print(f"Failed to get es IP: {str(e)}")
+                es_ip = None
+
+            platform = sys.platform
+            if platform == "win32":
+                es_ip = "localhost"
+
             if not es_ip:
                 print("Unable to get Elasticsearch IP")
                 if attempt < max_retries - 1:
@@ -381,6 +385,10 @@ def check_elk_status(max_retries=5, retry_delay=10):
             except Exception as e:
                 print(f"Failed to get Kibana IP: {str(e)}")
                 kibana_ip = None
+
+            platform = sys.platform
+            if platform == "win32":
+                kibana_ip = "localhost"
 
             if not kibana_ip:
                 print("Unable to get Kibana IP")

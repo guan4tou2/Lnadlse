@@ -12,6 +12,7 @@ RUN sed -i "s/http.kali.org/mirror.twds.com.tw/g" /etc/apt/sources.list && \
     apt-get -y upgrade
 RUN DEBIAN_FRONTEND=noninteractive apt-get -yq install \
     sudo \
+    dos2unix \
     openssh-server \
     python2 \
     python3-pip \
@@ -54,6 +55,8 @@ WORKDIR /home/kali
 RUN mkdir -p /home/kali/.config && \
     virtualenv /home/kali/.config/app && \
     echo "source /home/kali/.config/app/bin/activate" >> /home/kali/.bashrc
+
+RUN dos2unix /entrypoint.sh
 ENV PASSWORD=${KALI_PASSWORD}
 ENV SHELL=/bin/bash
 EXPOSE 8080

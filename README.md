@@ -31,8 +31,8 @@ A Docker-based network security simulation environment that includes ELK stack f
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
-cd <repository-name>
+git clone https://github.com/guan4tou2/Lnadlse
+cd Lnadlse
 ```
 
 2. Install ELK environment:

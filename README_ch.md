@@ -31,8 +31,8 @@
 
 1. 克隆倉庫：
 ```bash
-git clone <repository-url>
-cd <repository-name>
+git clone https://github.com/guan4tou2/Lnadlse
+cd Lnadlse
 ```
 
 2. 安裝 ELK 環境：

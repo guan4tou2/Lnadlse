@@ -27,7 +27,7 @@ services:
     build:
       context: ./Attacker/novnc
       dockerfile: Dockerfile
-    image: attacker_kali-novnc
+    image: attacker-novnc
     container_name: attacker-kali-novnc
     networks:
       - elk_net
@@ -51,7 +51,7 @@ services:
     build:
       context: ./Attacker/xrdp
       dockerfile: Dockerfile
-    image: attacker_kali-xrdp
+    image: attacker-xrdp
     container_name: attacker-kali-xrdp
     networks:
       - elk_net
@@ -74,7 +74,7 @@ services:
     build:
       context: ./Attacker/x11
       dockerfile: Dockerfile
-    image: attacker_kali-x11
+    image: attacker-x11
     container_name: attacker-kali-x11
     networks:
       - elk_net

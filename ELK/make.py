@@ -56,11 +56,19 @@ def install():
     ENV_PATH.write_text(new_content)
 
     # Create docker network if not exists
-    networks = subprocess.check_output(["docker", "network", "ls"], text=True)
-    if DOCKER_NETWORK not in networks:
+    print("[*] Creating docker network...")
+    networks_output = subprocess.check_output(["docker", "network", "ls"], text=True).splitlines()
+    network_names = [line.split()[1] for line in networks_output[1:] if len(line.split()) > 1]
+    if DOCKER_NETWORK not in network_names:
+        print(f"[*] Creating docker network {DOCKER_NETWORK}...")
         subprocess.run(["docker", "network", "create", DOCKER_NETWORK])
+        print(f"[*] Docker network {DOCKER_NETWORK} created")
+    else:
+        print(f"[*] Docker network {DOCKER_NETWORK} already exists")
 
-    subprocess.run(["docker-compose", "build"])
+    print("[*] Setted ELK stack")
+    print("[*] Run 'start' to start the stack")
+    # subprocess.run(["docker-compose", "build"])
 
 
 def show():

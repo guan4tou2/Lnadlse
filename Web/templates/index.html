@@ -133,7 +133,7 @@
               >
               <select id="targetType" class="form-select">
                 <option value="nginx">Nginx</option>
-                <!-- <option value="httpd">Apache</option> -->
+                <option value="httpd">Httpd</option>
               </select>
             </div>
             <div class="col-md-6">
@@ -330,25 +330,63 @@
         }
       }
 
+      function checkELKStatus() {
+        console.log("Checking ELK status...");
+        return fetch("/api/containers")
+          .then((response) => response.json())
+          .then((containers) => {
+            console.log("Containers:", containers);
+            const elkContainers = containers.filter(
+              (container) =>
+                container.name.toLowerCase().includes("elk") ||
+                container.name.toLowerCase().includes("elasticsearch") ||
+                container.name.toLowerCase().includes("kibana")
+            );
+            console.log("ELK containers:", elkContainers);
+            return {
+              hasELK: elkContainers.length > 0,
+              containers: elkContainers,
+            };
+          })
+          .catch((error) => {
+            console.error("Error checking ELK status:", error);
+            return {
+              hasELK: false,
+              error: error.message,
+            };
+          });
+      }
+
       function startELK() {
+        console.log("startELK function called");
         showLoading("Starting ELK Stack...");
         fetch("/api/start_elk", {
           method: "POST",
         })
           .then((response) => response.json())
           .then((data) => {
+            console.log("Start ELK response:", data);
             if (data.status === "success") {
-              showAlert("success", "ELK Stack started successfully");
+              showAlert(
+                "success",
+                "ELK Stack Started Successfully",
+                "You can now start the simulation environment. Click the 'Start Simulation' button."
+              );
             } else if (data.status === "warning") {
               showAlert("warning", data.message);
             } else {
-              showAlert("error", "Failed to start ELK Stack: " + data.message);
+              const error = data.error;
+              showAlert(
+                "danger",
+                `Error Code: ${error.code}<br>Error Message: ${error.message}`,
+                `Details: ${error.details}`
+              );
             }
             updateContainerStatus();
           })
           .catch((error) => {
             console.error("Error starting ELK Stack:", error);
-            showAlert("error", "Error starting ELK Stack: " + error.message);
+            showAlert("danger", "Failed to start ELK Stack", error.message);
           })
           .finally(() => {
             hideLoading();
@@ -356,35 +394,62 @@
       }
 
       function startSimulation() {
+        console.log("startSimulation function called");
         const targetType = document.getElementById("targetType").value;
         const attackerType = document.getElementById("attackerType").value;
-        showLoading("Starting simulation environment...");
-        fetch("/api/start_simulation", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            target_type: targetType,
-            attacker_type: attackerType,
-          }),
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.status === "success") {
-              showAlert("success", data.message);
-            } else {
-              showAlert("error", "Failed to start simulation: " + data.message);
-            }
-            updateContainerStatus();
+        console.log("Target type:", targetType, "Attacker type:", attackerType);
+
+        // Check ELK status first
+        checkELKStatus().then((result) => {
+          console.log("ELK status check result:", result);
+          if (!result.hasELK) {
+            showAlert(
+              "warning",
+              "ELK Stack Required",
+              "Please start the ELK Stack first before starting the simulation environment. Click the 'Start ELK Stack' button at the top of the page."
+            );
+            return;
+          }
+
+          showLoading("Starting simulation environment...");
+          console.log("Sending start simulation request...");
+          fetch("/api/start_simulation", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              target_type: targetType,
+              attacker_type: attackerType,
+            }),
           })
-          .catch((error) => {
-            console.error("Error starting simulation:", error);
-            showAlert("error", "Error starting simulation: " + error.message);
-          })
-          .finally(() => {
-            hideLoading();
-          });
+            .then((response) => response.json())
+            .then((data) => {
+              console.log("Start simulation response:", data);
+              if (data.status === "success") {
+                showAlert("success", data.message);
+              } else {
+                const error = data.error;
+                showAlert(
+                  "danger",
+                  `Error Code: ${error.code}<br>Error Message: ${error.message}`,
+                  `Details: ${error.details}`
+                );
+              }
+              updateContainerStatus();
+            })
+            .catch((error) => {
+              console.error("Error starting simulation:", error);
+              showAlert(
+                "danger",
+                "Failed to start simulation environment",
+                error.message
+              );
+            })
+            .finally(() => {
+              hideLoading();
+            });
+        });
       }
 
       function stopContainer(containerId) {
@@ -397,12 +462,12 @@
             if (data.success) {
               updateContainerStatus();
             } else {
-              alert("Failed to stop container: " + data.error);
+              showAlert("danger", "Failed to stop container", data.error);
             }
           })
           .catch((error) => {
             console.error("Error:", error);
-            alert("Failed to stop container: " + error.message);
+            showAlert("danger", "Failed to stop container", error.message);
           })
           .finally(() => {
             hideLoading();
@@ -416,12 +481,12 @@
         })
           .then((response) => response.json())
           .then((data) => {
-            alert(data.message);
+            showAlert("success", data.message);
             updateContainerStatus();
             updateNetworkStatus();
           })
           .catch((error) => {
-            alert("Error: " + error);
+            showAlert("danger", "Failed to stop all services", error.message);
           })
           .finally(() => {
             hideLoading();
@@ -582,64 +647,83 @@
         // Add start Simulation functionality
         document
           .getElementById("startSimulation")
-          .addEventListener("click", startSimulation);
+          .addEventListener("click", function () {
+            startSimulation();
+          });
+
+        // Add stop ELK Stack functionality
+        document
+          .getElementById("stopELK")
+          .addEventListener("click", async function () {
+            try {
+              showLoading("Stopping ELK Stack...");
+              const response = await fetch("/api/stop_elk", {
+                method: "POST",
+              });
+              const data = await response.json();
+              if (data.status === "success") {
+                showAlert("success", "ELK Stack stopped");
+              } else {
+                showAlert("error", "Failed to stop ELK Stack: " + data.message);
+              }
+            } catch (error) {
+              console.error("Error stopping ELK Stack:", error);
+              showAlert("error", "Error stopping ELK Stack: " + error.message);
+            } finally {
+              hideLoading();
+              updateContainerStatus();
+            }
+          });
+
+        // Add stop simulation functionality
+        document
+          .getElementById("stopSimulation")
+          .addEventListener("click", async function () {
+            try {
+              showLoading("Stopping simulation environment...");
+              const response = await fetch("/api/stop_simulation", {
+                method: "POST",
+              });
+              const data = await response.json();
+              if (data.status === "success") {
+                showAlert("success", "Simulation environment stopped");
+              } else {
+                showAlert(
+                  "error",
+                  "Failed to stop simulation: " + data.message
+                );
+              }
+            } catch (error) {
+              console.error("Error stopping simulation:", error);
+              showAlert("error", "Error stopping simulation: " + error.message);
+            } finally {
+              hideLoading();
+              updateContainerStatus();
+            }
+          });
       });
 
-      // Add stop ELK Stack functionality
-      document
-        .getElementById("stopELK")
-        .addEventListener("click", async function () {
-          try {
-            showLoading("Stopping ELK Stack...");
-            const response = await fetch("/api/stop_elk", {
-              method: "POST",
-            });
-            const data = await response.json();
-            if (data.status === "success") {
-              showAlert("success", "ELK Stack stopped");
-            } else {
-              showAlert("error", "Failed to stop ELK Stack: " + data.message);
-            }
-          } catch (error) {
-            console.error("Error stopping ELK Stack:", error);
-            showAlert("error", "Error stopping ELK Stack: " + error.message);
-          } finally {
-            hideLoading();
-            updateContainerStatus();
-          }
-        });
-
-      // Add stop simulation functionality
-      document
-        .getElementById("stopSimulation")
-        .addEventListener("click", async function () {
-          try {
-            showLoading("Stopping simulation environment...");
-            const response = await fetch("/api/stop_simulation", {
-              method: "POST",
-            });
-            const data = await response.json();
-            if (data.status === "success") {
-              showAlert("success", "Simulation environment stopped");
-            } else {
-              showAlert("error", "Failed to stop simulation: " + data.message);
-            }
-          } catch (error) {
-            console.error("Error stopping simulation:", error);
-            showAlert("error", "Error stopping simulation: " + error.message);
-          } finally {
-            hideLoading();
-            updateContainerStatus();
-          }
-        });
-
       // Show alert message
-      function showAlert(type, message) {
+      function showAlert(type, message, details = null) {
+        console.log("Showing alert:", { type, message, details });
         const alertDiv = document.createElement("div");
         alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
         alertDiv.role = "alert";
+        alertDiv.style.position = "fixed";
+        alertDiv.style.top = "20px";
+        alertDiv.style.left = "50%";
+        alertDiv.style.transform = "translateX(-50%)";
+        alertDiv.style.zIndex = "9999";
+        alertDiv.style.minWidth = "300px";
+        alertDiv.style.maxWidth = "80%";
+
+        let alertContent = message;
+        if (details) {
+          alertContent += `<hr><div class="mb-0"><small>${details}</small></div>`;
+        }
+
         alertDiv.innerHTML = `
-            ${message}
+            ${alertContent}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         `;
 
@@ -648,19 +732,14 @@
         existingAlerts.forEach((alert) => alert.remove());
 
         // Add new alert
-        document
-          .querySelector(".container")
-          .insertBefore(
-            alertDiv,
-            document.querySelector(".container").firstChild
-          );
+        document.body.appendChild(alertDiv);
 
-        // Auto close after 5 seconds
+        // Auto close after 10 seconds
         setTimeout(() => {
           if (alertDiv && alertDiv.parentNode) {
             alertDiv.remove();
           }
-        }, 5000);
+        }, 10000);
       }
     </script>
   </body>

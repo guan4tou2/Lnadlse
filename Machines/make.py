@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import platform
 import subprocess
 
 BASE_DIRS = {"Targeted": "./Targeted", "Attacker": "./Attacker"}
@@ -7,7 +8,18 @@ BASE_DIRS = {"Targeted": "./Targeted", "Attacker": "./Attacker"}
 DOCKER_NETWORK = "elk_net"
 
 # 默认构建的 Dockerfile 路径
-DEFAULT_BUILDS = {"targeted": "./Targeted/nginx", "attacker": "./Attacker/kali-novnc"}
+DEFAULT_BUILDS = {"targeted": "./Targeted/nginx", "attacker": "./Attacker/novnc"}
+
+
+def get_system_architecture():
+    """Detect system architecture and return corresponding beat architecture identifier"""
+    arch = platform.machine().lower()
+    if arch == "x86_64" or arch == "amd64":
+        return "x86_64"
+    elif arch == "aarch64" or arch == "arm64":
+        return "arm64"
+    else:
+        raise ValueError(f"Unsupported architecture: {arch}")
 
 
 def find_docker_builds(base_dir):
@@ -35,13 +47,47 @@ def select_path(paths):
 
 
 def build_image(path, image_prefix):
-    # 將 tag 轉為小寫字母
+    # Get system architecture
+    arch = get_system_architecture()
+
+    # Convert tag to lowercase
     tag = f"{image_prefix}_{os.path.basename(path)}".lower()
     dockerfile_path = os.path.join(path, "Dockerfile")
-    print(f"[*] Building image: {tag}")
-    subprocess.run(
-        ["docker", "build", "-t", tag, path, "-f", dockerfile_path], check=True
-    )
+
+    # Check if Dockerfile exists
+    if not os.path.exists(dockerfile_path):
+        print(f"[!] Error: Dockerfile not found: {dockerfile_path}")
+        return False
+
+    # Create temporary Dockerfile
+    temp_dockerfile = os.path.join(path, "Dockerfile.temp")
+    try:
+        with open(dockerfile_path, "r") as f:
+            content = f.read()
+
+        # Replace packetbeat architecture
+        content = content.replace(
+            "packetbeat-9.0.0-linux-arm64", f"packetbeat-9.0.0-linux-{arch}"
+        )
+        content = content.replace(
+            "filebeat-9.0.0-linux-arm64", f"filebeat-9.0.0-linux-{arch}"
+        )
+
+        with open(temp_dockerfile, "w") as f:
+            f.write(content)
+
+        print(f"[*] Building image: {tag} for architecture: {arch}")
+        subprocess.run(
+            ["docker", "build", "-t", tag, path, "-f", temp_dockerfile], check=True
+        )
+        return True
+    except Exception as e:
+        print(f"[!] Error building image: {str(e)}")
+        return False
+    finally:
+        # Clean up temporary file
+        if os.path.exists(temp_dockerfile):
+            os.remove(temp_dockerfile)
 
 
 def ensure_network():
@@ -68,10 +114,15 @@ def install():
     elif choice == "2":
         selected_dirs = [("attacker", BASE_DIRS["Attacker"])]
     elif choice == "3":
-        # 直接使用默认的 Nginx 和 noVNC Kali
+        # Use default Nginx and noVNC Kali
         print("[*] Building default images (Nginx + noVNC Kali)...")
+        success = True
         for prefix, path in DEFAULT_BUILDS.items():
-            build_image(path, prefix)
+            if not build_image(path, prefix):
+                success = False
+                print(f"[!] Failed to build {prefix} image")
+        if not success:
+            print("[!] Some images failed to build, please check error messages")
         return
     elif choice == "4":
         selected_dirs = [
@@ -82,14 +133,19 @@ def install():
         print("[!] Invalid choice.")
         return
 
+    success = True
     for prefix, path in selected_dirs:
         docker_paths = find_docker_builds(path)
         if not docker_paths:
             print(f"[!] No Dockerfiles found in {path}")
             continue
         selected = select_path(docker_paths)
-        if selected:
-            build_image(selected, prefix)
+        if selected and not build_image(selected, prefix):
+            success = False
+            print(f"[!] Failed to build {prefix} image")
+
+    if not success:
+        print("[!] Some images failed to build, please check error messages")
 
 
 def create_network():

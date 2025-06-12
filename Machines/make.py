@@ -14,6 +14,7 @@ DEFAULT_BUILDS = {"targeted": "./Targeted/nginx", "attacker": "./Attacker/novnc"
 def get_system_architecture():
     """Detect system architecture and return corresponding beat architecture identifier"""
     arch = platform.machine().lower()
+    print(f"[*] System architecture: {arch}")
     if arch == "x86_64" or arch == "amd64":
         return "x86_64"
     elif arch == "aarch64" or arch == "arm64":
@@ -62,7 +63,7 @@ def build_image(path, image_prefix):
     # Create temporary Dockerfile
     temp_dockerfile = os.path.join(path, "Dockerfile.temp")
     try:
-        with open(dockerfile_path, "r") as f:
+        with open(dockerfile_path, "r", encoding="utf-8") as f:
             content = f.read()
 
         # Replace packetbeat architecture
@@ -73,7 +74,7 @@ def build_image(path, image_prefix):
             "filebeat-9.0.0-linux-arm64", f"filebeat-9.0.0-linux-{arch}"
         )
 
-        with open(temp_dockerfile, "w") as f:
+        with open(temp_dockerfile, "w", encoding="utf-8") as f:
             f.write(content)
 
         print(f"[*] Building image: {tag} for architecture: {arch}")
